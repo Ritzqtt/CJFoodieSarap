@@ -66,13 +66,6 @@ export function IconSprite() {
           <circle cx="6.5" cy="18" r="1.8" />
           <circle cx="17.5" cy="18" r="1.8" />
         </symbol>
-        <symbol id="icon-star" viewBox="0 0 24 24">
-          <path
-            fill="currentColor"
-            stroke="none"
-            d="m12 2.6 2.8 5.7 6.3.9-4.6 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.2l6.3-.9z"
-          />
-        </symbol>
         <symbol id="icon-clock" viewBox="0 0 24 24">
           <circle cx="12" cy="12" r="9" />
           <path d="M12 7v5.2l3.4 2" />

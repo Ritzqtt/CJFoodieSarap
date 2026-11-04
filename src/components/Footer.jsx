@@ -62,9 +62,6 @@ export default function Footer() {
               <a href="#inquire" className="text-[.78rem] text-[#dce7cf] no-underline hover:text-gold hover:underline">
                 Send an Inquiry
               </a>
-              <a href="#reviews" className="text-[.78rem] text-[#dce7cf] no-underline hover:text-gold hover:underline">
-                Reviews
-              </a>
             </nav>
           </div>
 

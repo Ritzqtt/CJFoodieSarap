@@ -24,15 +24,12 @@ export const CONTACT = {
   viber: 'viber://chat?number=%2B639760684951',
   email: 'cjfoodiesarap@gmail.com',
   facebook: 'https://www.facebook.com/WingBreakersByCJFoodieSarap',
-  facebookReviews: 'https://www.facebook.com/WingBreakersByCJFoodieSarap/reviews/',
   messenger: 'https://m.me/WingBreakersByCJFoodieSarap',
   instagram: 'https://www.instagram.com/wingbreakers/',
   tiktok: 'https://www.tiktok.com/@heyitscy',
   address: 'Post Proper Southside, Taguig 1648',
   addressNote: 'Also referred to as "Palar, Taguig" on our flyers',
   hours: '[confirm hours]',
-  rating: '86%',
-  reviewCount: 8,
   delivery: 'FREE DELIVERY in Makati & Taguig',
 }
 
@@ -449,31 +446,6 @@ export const GALLERY = [
   { label: 'Desserts & salads', icon: 'cup', note: 'Replace with your photo' },
   { label: 'Crispy favorites', icon: 'heart', note: 'Replace with your photo' },
   { label: 'Happy Kafoodies', icon: 'camera', note: 'Replace with your photo' },
-]
-
-/* ---------- Placeholder reviews (replace with real quotes) ---------- */
-export const REVIEWS = [
-  {
-    tag: 'Placeholder review 01',
-    quote:
-      '"Your customer\'s review goes here. Replace this placeholder with a real quote from Facebook."',
-    name: 'Customer name',
-    meta: 'Facebook review · replace this',
-  },
-  {
-    tag: 'Placeholder review 02',
-    quote:
-      '"Another placeholder quote. Swap in a real comment about the food, delivery, or service."',
-    name: 'Customer name',
-    meta: 'Facebook review · replace this',
-  },
-  {
-    tag: 'Placeholder review 03',
-    quote:
-      '"Third placeholder quote. Keep it short and celebratory, just like your real reviews."',
-    name: 'Customer name',
-    meta: 'Facebook review · replace this',
-  },
 ]
 
 /* ---------- Helpers ---------- */

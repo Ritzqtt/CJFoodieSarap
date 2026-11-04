@@ -1,4 +1,4 @@
-import { BRAND, CONTACT, HERO_TILES, messengerUrl } from '../data'
+import { BRAND, HERO_TILES, messengerUrl } from '../data'
 import { Icon } from './Icons'
 
 const BOOK_MESSAGE =
@@ -68,9 +68,6 @@ export default function Hero() {
 
             <ul className="flex flex-wrap gap-x-4 gap-y-1.5 text-[.73rem] font-semibold text-muted">
               <li className="inline-flex items-center gap-1.5">
-                <Icon name="star" className="h-4 w-4 text-orange-deep" /> {CONTACT.rating} recommend on Facebook
-              </li>
-              <li className="inline-flex items-center gap-1.5">
                 <Icon name="cup" className="h-4 w-4 text-orange-deep" /> Free 1.5L softdrinks
               </li>
               <li className="inline-flex items-center gap-1.5">
@@ -99,10 +96,6 @@ export default function Hero() {
             <div className="absolute -bottom-3 -left-1 flex max-w-[165px] -rotate-2 items-center gap-2 rounded-[14px] bg-white px-3 py-2 text-[.68rem] leading-tight font-bold text-forest shadow-[0_10px_24px_rgba(31,77,26,.2)] max-[400px]:max-w-[145px] max-[400px]:text-[.62rem]" aria-hidden="true">
               <Icon name="tray" className="h-5 w-5 text-orange-deep" />
               <span>Party trays from ₱3,000</span>
-            </div>
-            <div className="absolute top-4 -right-1 flex max-w-[165px] rotate-2 items-center gap-2 rounded-[14px] bg-white px-3 py-2 text-[.68rem] leading-tight font-bold text-forest shadow-[0_10px_24px_rgba(31,77,26,.2)] max-[400px]:max-w-[145px] max-[400px]:text-[.62rem]" aria-hidden="true">
-              <Icon name="star" className="h-5 w-5 text-orange-deep" />
-              <span>{CONTACT.rating} recommend · {CONTACT.reviewCount} reviews</span>
             </div>
           </div>
         </div>

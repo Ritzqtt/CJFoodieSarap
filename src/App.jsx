@@ -9,7 +9,6 @@ import InquiryForm from './components/InquiryForm'
 import Navbar from './components/Navbar'
 import PackedMeals from './components/PackedMeals'
 import PartyPackages from './components/PartyPackages'
-import Reviews from './components/Reviews'
 import StickyMobileBar from './components/StickyMobileBar'
 import TrayMenu from './components/TrayMenu'
 import useReveal from './hooks/useReveal'
@@ -38,7 +37,6 @@ export default function App() {
         <HowToBook />
         <InquiryForm />
         <Gallery />
-        <Reviews />
         <Contact />
       </main>
 
