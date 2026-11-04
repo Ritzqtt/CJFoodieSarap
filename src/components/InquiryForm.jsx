@@ -173,7 +173,7 @@ export default function InquiryForm() {
 
   const handleCopy = async () => {
     if (!message) return
-    let copied = false
+    let copied
     try {
       await navigator.clipboard.writeText(message)
       copied = true

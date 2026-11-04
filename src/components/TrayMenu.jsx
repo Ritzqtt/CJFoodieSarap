@@ -24,7 +24,7 @@ export default function TrayMenu() {
   const selectCategory = (id) => setActiveId(id)
 
   const handleTabKeyDown = (event, index) => {
-    let nextIndex = index
+    let nextIndex
     if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
       nextIndex = (index + 1) % MENU_CATEGORIES.length
     } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
@@ -52,7 +52,7 @@ export default function TrayMenu() {
           </SectionHeading>
         </div>
 
-        <div className="reveal mb-5 grid gap-3 min-[860px]:grid-cols-[1fr_auto] min-[860px]:items-center">
+        <div className="reveal mb-5 grid gap-3">
           <div className="tabs-scroller overflow-x-auto pb-1.5">
             <div
               className="flex w-max min-w-full gap-1 rounded-full border border-forest/15 bg-white p-1.5 shadow-[0_4px_14px_rgba(31,77,26,.08)]"
@@ -89,7 +89,7 @@ export default function TrayMenu() {
           </div>
 
           <div
-            className="flex flex-wrap items-center gap-1.5 rounded-[17px] border border-forest/15 bg-white px-3 py-2.5 shadow-[0_4px_14px_rgba(31,77,26,.08)] min-[860px]:justify-end"
+            className="flex flex-wrap items-center gap-1.5 rounded-[17px] border border-forest/15 bg-white px-3 py-2.5 shadow-[0_4px_14px_rgba(31,77,26,.08)] justify-self-start min-[860px]:justify-self-end"
             role="group"
             aria-label="Choose tray size"
           >

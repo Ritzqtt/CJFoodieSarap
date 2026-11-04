@@ -14,22 +14,24 @@ export default function Reviews() {
         </div>
 
         <div
-          className="reveal mx-auto mb-8 flex max-w-[580px] flex-wrap items-center gap-x-4 gap-y-3 rounded-[22px] border-2 border-forest/15 bg-white px-5 py-4 shadow-[0_8px_0_rgba(31,77,26,.06)]"
+          className="reveal mx-auto mb-8 flex max-w-[600px] flex-col gap-3 rounded-[22px] border-2 border-forest/15 bg-white px-5 py-4 shadow-[0_8px_0_rgba(31,77,26,.06)] sm:flex-row sm:items-center"
           aria-label={`${CONTACT.rating} percent recommend on Facebook, based on ${CONTACT.reviewCount} reviews`}
         >
-          <span className="font-display text-[3.2rem] leading-[.8] tracking-[.02em] text-forest" aria-hidden="true">
-            {CONTACT.rating}
-          </span>
-          <span className="min-w-[170px] flex-1">
-            <strong className="block text-[.9rem] leading-tight text-forest">
-              recommend CJFoodieSarap on Facebook
-            </strong>
-            <span className="block text-[.72rem] font-medium text-muted">
-              Based on {CONTACT.reviewCount} Facebook reviews
+          <div className="flex items-center gap-4">
+            <span className="font-display text-[3.2rem] leading-[.8] tracking-[.02em] text-forest" aria-hidden="true">
+              {CONTACT.rating}
             </span>
-          </span>
+            <span>
+              <strong className="block text-[.88rem] leading-tight text-forest">
+                recommend CJFoodieSarap
+              </strong>
+              <span className="block text-[.7rem] font-medium text-muted">
+                on Facebook · based on {CONTACT.reviewCount} reviews
+              </span>
+            </span>
+          </div>
           <a
-            className="ml-auto inline-flex items-center gap-1.5 text-[.7rem] font-bold text-forest no-underline hover:text-orange-deep"
+            className="inline-flex items-center gap-1.5 self-start text-[.7rem] font-bold text-forest no-underline hover:text-orange-deep sm:ml-auto sm:self-auto"
             href={CONTACT.facebookReviews}
             target="_blank"
             rel="noopener noreferrer"
