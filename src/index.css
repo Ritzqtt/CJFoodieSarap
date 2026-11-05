@@ -28,6 +28,15 @@
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* old Edge / IE */
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none; /* Chrome, Edge, Safari */
+    width: 0;
+    height: 0;
   }
 
   body {
@@ -281,16 +290,14 @@
   }
 }
 
-/* Thin horizontal scrollbar for the category tabs */
-.tabs-scroller {
-  scrollbar-width: thin;
+/* Hide the scrollbar on inner scroll areas without disabling scrolling */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
-.tabs-scroller::-webkit-scrollbar {
-  height: 4px;
-}
-
-.tabs-scroller::-webkit-scrollbar-thumb {
-  border-radius: 999px;
-  background: rgb(31 77 26 / 22%);
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }

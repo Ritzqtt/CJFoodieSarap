@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   MENU_CATEGORIES,
   PRICE_GROUPS,
@@ -15,7 +15,32 @@ const ASK_MESSAGE =
 export default function TrayMenu() {
   const [activeId, setActiveId] = useState(MENU_CATEGORIES[0].id)
   const [sizeIndex, setSizeIndex] = useState(1)
+  const [tabsScroll, setTabsScroll] = useState({ left: false, right: false })
   const tabRefs = useRef([])
+  const tabsScrollerRef = useRef(null)
+
+  useEffect(() => {
+    const scroller = tabsScrollerRef.current
+    if (!scroller) return undefined
+
+    const updateEdges = () => {
+      setTabsScroll({
+        left: scroller.scrollLeft > 4,
+        right: scroller.scrollLeft + scroller.clientWidth < scroller.scrollWidth - 4,
+      })
+    }
+
+    updateEdges()
+    scroller.addEventListener('scroll', updateEdges, { passive: true })
+    const observer = new ResizeObserver(updateEdges)
+    observer.observe(scroller)
+    if (scroller.firstElementChild) observer.observe(scroller.firstElementChild)
+
+    return () => {
+      scroller.removeEventListener('scroll', updateEdges)
+      observer.disconnect()
+    }
+  }, [])
 
   const category = MENU_CATEGORIES.find((item) => item.id === activeId) ?? MENU_CATEGORIES[0]
   const prices = PRICE_GROUPS[category.priceGroup]
@@ -53,39 +78,54 @@ export default function TrayMenu() {
         </div>
 
         <div className="reveal mb-5 grid gap-3">
-          <div className="tabs-scroller overflow-x-auto pb-1.5">
-            <div
-              className="flex w-max min-w-full gap-1 rounded-full border border-forest/15 bg-white p-1.5 shadow-[0_4px_14px_rgba(31,77,26,.08)]"
-              role="tablist"
-              aria-label="Menu categories"
-            >
-              {MENU_CATEGORIES.map((item, index) => {
-                const selected = item.id === activeId
-                return (
-                  <button
-                    key={item.id}
-                    ref={(element) => {
-                      tabRefs.current[index] = element
-                    }}
-                    id={`menu-tab-${item.id}`}
-                    type="button"
-                    role="tab"
-                    aria-selected={selected}
-                    aria-controls="menu-panel"
-                    tabIndex={selected ? 0 : -1}
-                    onClick={() => selectCategory(item.id)}
-                    onKeyDown={(event) => handleTabKeyDown(event, index)}
-                    className={`min-h-[42px] rounded-full px-3 py-2 text-[.8rem] font-semibold whitespace-nowrap transition ${
-                      selected
-                        ? 'bg-forest text-white shadow-[0_3px_8px_rgba(18,51,15,.2)]'
-                        : 'text-forest hover:bg-forest/10'
-                    }`}
-                  >
-                    {item.name}
-                  </button>
-                )
-              })}
+          <div className="relative min-w-0">
+            <div ref={tabsScrollerRef} className="no-scrollbar overflow-x-auto pb-1.5">
+              <div
+                className="flex w-max min-w-full gap-1 rounded-full border border-forest/15 bg-white p-1.5 shadow-[0_4px_14px_rgba(31,77,26,.08)]"
+                role="tablist"
+                aria-label="Menu categories"
+              >
+                {MENU_CATEGORIES.map((item, index) => {
+                  const selected = item.id === activeId
+                  return (
+                    <button
+                      key={item.id}
+                      ref={(element) => {
+                        tabRefs.current[index] = element
+                      }}
+                      id={`menu-tab-${item.id}`}
+                      type="button"
+                      role="tab"
+                      aria-selected={selected}
+                      aria-controls="menu-panel"
+                      tabIndex={selected ? 0 : -1}
+                      onClick={() => selectCategory(item.id)}
+                      onKeyDown={(event) => handleTabKeyDown(event, index)}
+                      className={`min-h-[42px] rounded-full px-3 py-2 text-[.8rem] font-semibold whitespace-nowrap transition ${
+                        selected
+                          ? 'bg-forest text-white shadow-[0_3px_8px_rgba(18,51,15,.2)]'
+                          : 'text-forest hover:bg-forest/10'
+                      }`}
+                    >
+                      {item.name}
+                    </button>
+                  )
+                })}
+              </div>
             </div>
+
+            <span
+              aria-hidden="true"
+              className={`pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-cream to-transparent transition-opacity duration-200 ${
+                tabsScroll.left ? 'opacity-100' : 'opacity-0'
+              }`}
+            />
+            <span
+              aria-hidden="true"
+              className={`pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-cream to-transparent transition-opacity duration-200 ${
+                tabsScroll.right ? 'opacity-100' : 'opacity-0'
+              }`}
+            />
           </div>
 
           <div
