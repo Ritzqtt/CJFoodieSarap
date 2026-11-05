@@ -15,12 +15,15 @@ export default function Hero() {
         <div className="grid items-center gap-8 lg:grid-cols-[1.03fr_.97fr] lg:gap-12">
           <div className="reveal">
             <div className="mb-4 inline-flex items-center gap-2.5">
-              <span
-                className="grid h-[54px] w-[54px] place-items-center rounded-full bg-forest text-cream shadow-[inset_0_0_0_3px_rgba(249,178,51,.75),4px_4px_0_rgba(31,77,26,.12)]"
-                aria-hidden="true"
-              >
-                <Icon name="cloche" className="h-9 w-9" />
-              </span>
+              <img
+                src={BRAND.logo}
+                alt={`${BRAND.name} logo`}
+                width={54}
+                height={54}
+                loading="eager"
+                decoding="async"
+                className="h-[54px] w-[54px] shrink-0 rounded-full object-cover shadow-[4px_4px_0_rgba(31,77,26,.12)]"
+              />
               <span>
                 <span className="block font-display text-[clamp(1.7rem,4vw,2.1rem)] leading-[.9] tracking-[.04em] text-forest">
                   {BRAND.name}

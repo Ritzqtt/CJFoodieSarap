@@ -15,6 +15,7 @@ export const BRAND = {
     'Delicious food, made fresh.',
   ],
   cta: "Let's go, Kafoodies!",
+  logo: '/logo.png',
 }
 
 export const CONTACT = {

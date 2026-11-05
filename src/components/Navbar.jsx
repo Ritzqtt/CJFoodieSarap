@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { BRAND, CONTACT, NAV_LINKS, messengerUrl } from '../data'
-import { Icon } from './Icons'
 
 const BOOK_MESSAGE =
   "Hi! I'd like to book a handaan order. Can you help me choose a package?"
@@ -33,12 +32,15 @@ export default function Navbar() {
     >
       <div className="wrap flex min-h-[70px] items-center justify-between gap-3">
         <a href="#home" className="flex min-w-0 items-center gap-2.5 no-underline" aria-label="CJFoodieSarap — back to top">
-          <span
-            className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-forest text-cream shadow-[inset_0_0_0_2px_rgba(249,178,51,.7),0_3px_0_rgba(18,51,15,.25)]"
-            aria-hidden="true"
-          >
-            <Icon name="cloche" className="h-7 w-7" />
-          </span>
+          <img
+            src={BRAND.logo}
+            alt={`${BRAND.name} logo`}
+            width={44}
+            height={44}
+            loading="eager"
+            decoding="async"
+            className="h-11 w-11 shrink-0 rounded-full object-cover shadow-[0_3px_0_rgba(18,51,15,.25)]"
+          />
           <span>
             <span className="block font-display text-[clamp(1.28rem,3vw,1.55rem)] leading-[.85] tracking-[.035em] whitespace-nowrap text-forest">
               {BRAND.name}

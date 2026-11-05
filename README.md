@@ -26,7 +26,7 @@ Open the local URL printed by Vite (usually `http://localhost:5173`).
 
 **Almost everything lives in [`src/data.js`](src/data.js).** Update that one file to change:
 
-- Brand name, taglines, and "since" year (`BRAND`)
+- Brand name, logo, taglines, and "since" year (`BRAND`)
 - Phone, email, social links, address, and delivery note (`CONTACT`, `SOCIALS`)
 - Navigation labels (`NAV_LINKS`) and hero tiles (`HERO_TILES`)
 - Tray sizes and price groups (`TRAY_SIZES`, `PRICE_GROUPS`)

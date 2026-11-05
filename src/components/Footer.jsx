@@ -14,9 +14,15 @@ export default function Footer() {
         <div className="grid gap-7 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.1fr] lg:gap-8">
           <div>
             <a href="#home" className="inline-flex items-center gap-2.5 no-underline" aria-label="CJFoodieSarap — back to top">
-              <span className="grid h-11 w-11 place-items-center rounded-full bg-cream/10 text-cream shadow-[inset_0_0_0_2px_rgba(249,178,51,.7)]" aria-hidden="true">
-                <Icon name="cloche" className="h-7 w-7" />
-              </span>
+              <img
+                src={BRAND.logo}
+                alt={`${BRAND.name} logo`}
+                width={44}
+                height={44}
+                loading="eager"
+                decoding="async"
+                className="h-11 w-11 rounded-full object-cover shadow-[0_3px_0_rgba(0,0,0,.25)]"
+              />
               <span>
                 <span className="block font-display text-[1.45rem] leading-[.85] tracking-[.04em] text-white">
                   {BRAND.name}
