@@ -3,7 +3,7 @@ import { BRAND, CONTACT, NAV_LINKS, messengerUrl } from '../data'
 import { Icon } from './Icons'
 
 const BOOK_MESSAGE =
-  "Hi CJFoodieSarap! I'd like to book a handaan order. Can you help me choose a package?"
+  "Hi! I'd like to book a handaan order. Can you help me choose a package?"
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)

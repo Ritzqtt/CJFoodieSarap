@@ -29,7 +29,7 @@ function formatDate(isoDate) {
 
 function buildInquiryMessage(values) {
   return [
-    'Hi CJFoodieSarap! I would like to inquire about an order.',
+    'Hi po! I would like to inquire about an order.',
     '',
     `Name: ${values.name}`,
     `Mobile: ${values.mobile}`,

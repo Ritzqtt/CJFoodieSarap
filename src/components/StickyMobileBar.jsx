@@ -2,7 +2,7 @@ import { CONTACT, messengerUrl } from '../data'
 import { Icon } from './Icons'
 
 const MESSAGE =
-  "Hi CJFoodieSarap! I'd like to inquire about your party trays, bilao, and packed meals."
+  "Hi po! I'd like to inquire about your party trays, bilao, and packed meals."
 
 export default function StickyMobileBar() {
   return (

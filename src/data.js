@@ -444,10 +444,10 @@ export const messengerUrl = (text) =>
 
 export const packageInquiryUrl = (pkg) =>
   messengerUrl(
-    `Hi CJFoodieSarap! I'd like to book Package ${pkg.id} (${formatPeso(pkg.price)}). Please send me the available dates and next steps. Salamat!`,
+    `Hi! I'd like to book Package ${pkg.id} (${formatPeso(pkg.price)}). Please send me the available dates and next steps. Salamat!`,
   )
 
 export const bilaoInquiryUrl = (set) =>
   messengerUrl(
-    `Hi CJFoodieSarap! I'd like to order Bilao Set ${set.id} (${formatPeso(set.price)} · ${set.pax}). Please send me the available dates. Salamat!`,
+    `Hello! I'd like to order Bilao Set ${set.id} (${formatPeso(set.price)} · ${set.pax}). Please send me the available dates. Salamat!`,
   )

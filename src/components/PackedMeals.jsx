@@ -3,7 +3,7 @@ import { Icon } from './Icons'
 import SectionHeading from './SectionHeading'
 
 const MEAL_MESSAGE =
-  "Hi CJFoodieSarap! I'd like to order food packed meals. Here are my details:"
+  "Hello! I'd like to order food packed meals. Here are my details:"
 
 export default function PackedMeals() {
   return (

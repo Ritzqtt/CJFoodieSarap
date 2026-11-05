@@ -10,7 +10,7 @@ import { Icon } from './Icons'
 import SectionHeading from './SectionHeading'
 
 const ASK_MESSAGE =
-  "Hi CJFoodieSarap! I'd like help building a tray order for my handaan. Here's what I have in mind:"
+  "Hello po! I'd like help building a tray order for my handaan. Here's what I have in mind:"
 
 export default function TrayMenu() {
   const [activeId, setActiveId] = useState(MENU_CATEGORIES[0].id)

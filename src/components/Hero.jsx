@@ -2,7 +2,7 @@ import { BRAND, HERO_TILES, messengerUrl } from '../data'
 import { Icon } from './Icons'
 
 const BOOK_MESSAGE =
-  "Hi CJFoodieSarap! I'd like to book an order. Here's what I'm planning:"
+  "Hello po! I'd like to book an order. Here's what I'm planning:"
 
 export default function Hero() {
   return (
