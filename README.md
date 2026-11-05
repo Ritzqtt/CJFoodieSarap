@@ -42,7 +42,7 @@ Prices are plain numbers in Philippine pesos and are formatted with `formatPeso(
 
 1. **Photos** — replace every placeholder marked `Photo placeholder`, `Photo`, or `Replace with your photo`. The hero photo block is in `src/components/Hero.jsx`.
 2. **Hours** — `CONTACT.hours` is set to `[confirm hours]` because Facebook only lists "Always open". Update it, along with `Contact.jsx` and `Footer.jsx` if the wording changes.
-3. **Map** — replace the map placeholder in `src/components/Contact.jsx` with a Google Maps embed iframe.
+3. **Map** — the Contact section uses a real Google Maps embed; update `CONTACT.mapEmbedUrl` and `CONTACT.mapLink` if the location changes.
 4. **Social preview image** — add a real 1200×630 photo as `public/og-image.jpg` (the Open Graph tag in `index.html` points to `og-image.jpg`).
 5. **Favicon** — the page currently uses an inline SVG favicon in `index.html`; swap it for a real logo file if preferred.
 
@@ -66,7 +66,7 @@ src/
     PackedMeals.jsx         Packed meal groups A–D
     HowToBook.jsx           Four booking steps + delivery note
     InquiryForm.jsx         Validated form → Messenger / mailto + copy fallback
-    Contact.jsx             Contact details, socials, map placeholder
+    Contact.jsx             Contact details, socials, Google Maps embed
     Footer.jsx              Logo, links, socials, copyright
     StickyMobileBar.jsx     Mobile-only Messenger / Call bar
     SectionHeading.jsx      Reusable brush-stroke section heading

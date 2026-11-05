@@ -237,14 +237,6 @@
     pointer-events: none;
   }
 
-  .map-grid {
-    background-image:
-      linear-gradient(rgb(31 77 26 / 8%) 1px, transparent 1px),
-      linear-gradient(90deg, rgb(31 77 26 / 8%) 1px, transparent 1px);
-    background-color: #f1e4cb;
-    background-size: 26px 26px, 26px 26px;
-  }
-
   .dot-bg {
     background-image: radial-gradient(rgb(31 77 26 / 16%) 1px, transparent 1px);
     background-size: 24px 24px;

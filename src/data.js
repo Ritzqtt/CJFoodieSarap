@@ -30,6 +30,9 @@ export const CONTACT = {
   tiktok: 'https://www.tiktok.com/@heyitscy',
   address: 'Post Proper Southside, Taguig 1648',
   addressNote: 'Also referred to as "Palar, Taguig" on our flyers',
+  mapLink: 'https://maps.app.goo.gl/X7co2riLjvmZzmCJ8',
+  mapEmbedUrl: 'https://www.google.com/maps?q=14.5351468,121.0541207&z=18&output=embed',
+  mapTitle: 'Map showing CJFoodieSarap (Wing Breakers) at Post Proper Southside, Taguig',
   hours: '[confirm hours]',
   delivery: 'FREE DELIVERY in Makati & Taguig',
 }

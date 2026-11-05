@@ -2,7 +2,7 @@ import { BRAND, CONTACT, NAV_LINKS, SOCIALS } from '../data'
 import { Icon } from './Icons'
 
 const MAPS_URL =
-  'https://www.google.com/maps/search/?api=1&query=Post+Proper+Southside+Taguig+1648'
+  'https://maps.app.goo.gl/X7co2riLjvmZzmCJ8'
 
 export default function Footer() {
   return (

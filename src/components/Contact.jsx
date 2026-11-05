@@ -2,9 +2,6 @@ import { CONTACT, SOCIALS } from '../data'
 import { Icon } from './Icons'
 import SectionHeading from './SectionHeading'
 
-const MAPS_URL =
-  'https://www.google.com/maps/search/?api=1&query=Post+Proper+Southside+Taguig+1648'
-
 export default function Contact() {
   return (
     <section id="contact" className="bg-cream py-14 sm:py-20">
@@ -16,7 +13,7 @@ export default function Contact() {
           </SectionHeading>
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-[1.05fr_.95fr] lg:items-start">
+        <div className="grid items-stretch gap-4 lg:grid-cols-2">
           <div className="reveal rounded-[26px] border border-forest/15 bg-paper p-4 shadow-[0_6px_0_rgba(31,77,26,.05)] sm:p-5">
             <h3 className="mb-3 flex items-center gap-2 font-display text-[1.5rem] tracking-[.04em] text-forest">
               <Icon name="phone" className="h-[22px] w-[22px] text-orange-deep" /> Reach Us
@@ -113,28 +110,31 @@ export default function Contact() {
             </div>
           </div>
 
-          <div className="reveal lg:sticky lg:top-24" style={{ transitionDelay: '80ms' }}>
-            {/* MAP EMBED: replace this block with your Google Maps iframe when ready. */}
-            <div
-              className="map-grid relative grid min-h-[300px] place-content-center gap-1 overflow-hidden rounded-[26px] border-2 border-dashed border-forest/30 px-4 py-6 text-center text-[#46543a]"
-              aria-label="Map placeholder for CJFoodieSarap in Post Proper Southside, Taguig"
-            >
-              <span className="absolute top-2.5 left-2.5 rounded-full bg-forest/90 px-2 py-0.5 text-[.5rem] font-extrabold tracking-[.1em] text-cream uppercase">
-                Map placeholder
-              </span>
-              <span className="mx-auto mb-1 grid h-[54px] w-[54px] place-items-center rounded-full bg-forest text-gold shadow-[0_0_0_8px_rgba(31,77,26,.13),0_10px_20px_rgba(31,77,26,.22)]" aria-hidden="true">
-                <Icon name="pin" className="h-7 w-7" />
-              </span>
-              <strong className="text-[.9rem]">Google Map embed goes here</strong>
-              <span className="text-[.72rem] text-[#5e5a48]">{CONTACT.address}</span>
-              <a
-                className="btn btn-outline btn-sm mx-auto mt-2"
-                href={MAPS_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Icon name="pin" /> Open in Google Maps
-              </a>
+          <div className="reveal h-full" style={{ transitionDelay: '80ms' }}>
+            <div className="relative h-full min-h-[320px] overflow-hidden rounded-[26px] border border-forest/20 bg-[#f1e4cb] shadow-[0_6px_0_rgba(31,77,26,.05)] sm:min-h-[380px]">
+              <iframe
+                src={CONTACT.mapEmbedUrl}
+                title={CONTACT.mapTitle}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+                className="absolute inset-0 h-full w-full border-0"
+              />
+
+              <p className="pointer-events-none absolute top-3 left-3 rounded-full bg-cream/95 px-2.5 py-1 text-[.62rem] font-semibold text-forest shadow-[0_2px_8px_rgba(18,51,15,.22)]">
+                {CONTACT.address}
+              </p>
+
+              <div className="pointer-events-none absolute inset-x-3 bottom-3 flex justify-center">
+                <a
+                  className="btn btn-outline btn-sm pointer-events-auto bg-cream/95 shadow-[0_2px_10px_rgba(18,51,15,.25)]"
+                  href={CONTACT.mapLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Icon name="pin" /> Open in Google Maps
+                </a>
+              </div>
             </div>
           </div>
         </div>
