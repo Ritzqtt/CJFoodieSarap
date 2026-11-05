@@ -1,7 +1,6 @@
 import BilaoPackages from './components/BilaoPackages'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
-import Gallery from './components/Gallery'
 import Hero from './components/Hero'
 import HowToBook from './components/HowToBook'
 import { IconSprite } from './components/Icons'
@@ -36,7 +35,6 @@ export default function App() {
         <PackedMeals />
         <HowToBook />
         <InquiryForm />
-        <Gallery />
         <Contact />
       </main>
 

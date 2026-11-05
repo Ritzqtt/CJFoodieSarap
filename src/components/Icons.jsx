@@ -115,13 +115,6 @@ export function IconSprite() {
         <symbol id="icon-arrow" viewBox="0 0 24 24">
           <path d="M4 12h15M13 5.5 19.5 12 13 18.5" />
         </symbol>
-        <symbol id="icon-camera" viewBox="0 0 24 24">
-          <path d="M4 8h3l1.5-2h7L17 8h3a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 20 20H4a1.5 1.5 0 0 1-1.5-1.5v-9A1.5 1.5 0 0 1 4 8z" />
-          <circle cx="12" cy="13.5" r="3.5" />
-        </symbol>
-        <symbol id="icon-utensils" viewBox="0 0 24 24">
-          <path d="M6.5 3v7a2.5 2.5 0 0 0 5 0V3M9 3v18M16.5 3c-1.6 1-2.5 2.6-2.5 4.5 0 1.6.8 2.9 2.5 3.5V21" />
-        </symbol>
         <symbol id="icon-send" viewBox="0 0 24 24">
           <path d="m21 3-7.2 18-3.6-7.2L3 10.2zM10.2 13.8 21 3" />
         </symbol>

@@ -436,18 +436,6 @@ export const STEPS = [
   },
 ]
 
-/* ---------- Gallery placeholders (swap for real photos) ---------- */
-export const GALLERY = [
-  { label: 'Party tray spread', icon: 'tray', note: 'Replace with your photo', featured: true },
-  { label: 'Bilao flat lay', icon: 'bilao', note: 'Replace with your photo' },
-  { label: 'Packed meals', icon: 'box', note: 'Replace with your photo' },
-  { label: 'Birthday handaan', icon: 'cloche', note: 'Replace with your photo' },
-  { label: 'Pasta & pansit', icon: 'utensils', note: 'Replace with your photo' },
-  { label: 'Desserts & salads', icon: 'cup', note: 'Replace with your photo' },
-  { label: 'Crispy favorites', icon: 'heart', note: 'Replace with your photo' },
-  { label: 'Happy Kafoodies', icon: 'camera', note: 'Replace with your photo' },
-]
-
 /* ---------- Helpers ---------- */
 export const formatPeso = (amount) => '₱' + Number(amount).toLocaleString('en-PH')
 

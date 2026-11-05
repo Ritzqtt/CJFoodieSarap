@@ -237,30 +237,6 @@
     pointer-events: none;
   }
 
-  .gallery-ph {
-    position: relative;
-    overflow: hidden;
-    border: 2px dashed rgb(31 77 26 / 26%);
-    border-radius: 20px;
-    background:
-      repeating-linear-gradient(135deg, rgb(31 77 26 / 5%) 0 12px, transparent 12px 24px),
-      #f2e4c9;
-    transition: transform 0.22s ease, border-color 0.22s ease;
-  }
-
-  .gallery-ph:nth-child(2n) {
-    background-color: #efe0c3;
-  }
-
-  .gallery-ph:nth-child(3n) {
-    background-color: #f6e7cd;
-  }
-
-  .gallery-ph:hover {
-    transform: translateY(-3px);
-    border-color: rgb(245 130 32 / 55%);
-  }
-
   .map-grid {
     background-image:
       linear-gradient(rgb(31 77 26 / 8%) 1px, transparent 1px),
@@ -308,8 +284,7 @@
     transform: none;
   }
 
-  .btn:hover,
-  .gallery-ph:hover {
+  .btn:hover {
     transform: none;
   }
 }
