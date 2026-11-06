@@ -16,6 +16,7 @@ export const BRAND = {
   ],
   cta: "Let's go, Kafoodies!",
   logo: '/logo.png',
+  heroPhoto: '/photo.jpg',
 }
 
 export const CONTACT = {
@@ -33,7 +34,13 @@ export const CONTACT = {
   mapLink: 'https://maps.app.goo.gl/X7co2riLjvmZzmCJ8',
   mapEmbedUrl: 'https://www.google.com/maps?q=14.5351468,121.0541207&z=18&output=embed',
   mapTitle: 'Map showing CJFoodieSarap (Wing Breakers) at Post Proper Southside, Taguig',
-  hours: '[confirm hours]',
+  hours: 'Always open',
+  hoursNote: 'Message us to book your date',
+  services: [
+    { label: 'Delivery', icon: 'truck' },
+    { label: 'Online booking', icon: 'calendar' },
+    { label: 'Reservations', icon: 'users' },
+  ],
   delivery: 'FREE DELIVERY in Makati & Taguig',
 }
 

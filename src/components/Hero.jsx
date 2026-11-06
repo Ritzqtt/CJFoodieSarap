@@ -1,10 +1,16 @@
+import { useState } from 'react'
 import { BRAND, HERO_TILES, messengerUrl } from '../data'
 import { Icon } from './Icons'
 
 const BOOK_MESSAGE =
   "Hello po! I'd like to book an order. Here's what I'm planning:"
 
+const HERO_PHOTO_ALT =
+  'CJFoodieSarap handaan spread with party trays of beef, lumpia, lechon, rice, and vegetables'
+
 export default function Hero() {
+  const [photoFailed, setPhotoFailed] = useState(false)
+
   return (
     <section id="home" className="relative overflow-hidden bg-cream pt-8 pb-10 sm:pt-12 sm:pb-14 lg:pt-16 lg:pb-16">
       <div className="dot-bg pointer-events-none absolute inset-0 opacity-35 [mask-image:linear-gradient(to_bottom,#000,transparent_72%)]" aria-hidden="true" />
@@ -80,25 +86,41 @@ export default function Hero() {
           </div>
 
           <div className="reveal relative mx-auto w-full max-w-[470px]" style={{ transitionDelay: '120ms' }}>
-            {/* PHOTO: replace this block with <img src="hero-spread.jpg" alt="..." /> when ready. */}
             <div
-              className="photo-ph grid aspect-[5/4] place-content-center gap-1 p-6 text-center text-[#46543a] lg:aspect-[1/.92]"
-              role="img"
-              aria-label="Placeholder for a photo of a CJFoodieSarap party tray spread"
+              className={`photo-ph relative aspect-[5/4] lg:aspect-[1/.92] ${
+                photoFailed ? '' : '[&::before]:hidden'
+              }`}
             >
-              <span className="absolute top-3.5 left-3.5 rounded-full bg-forest px-2.5 py-1 text-[.55rem] font-extrabold tracking-[.13em] text-cream uppercase">
-                Photo placeholder
-              </span>
-              <Icon name="cloche" className="mx-auto mb-1 h-[76px] w-[76px] text-forest opacity-65" />
-              <span className="relative text-[.95rem] font-bold">Your handaan spread here</span>
-              <span className="relative text-[.68rem] tracking-[.04em] text-[#5e5a48]">
-                Swap in a real food photo · 1200 × 900px
-              </span>
+              {photoFailed ? (
+                <div
+                  className="grid h-full place-content-center gap-1 p-6 text-center text-[#46543a]"
+                  role="img"
+                  aria-label="Placeholder for a photo of a CJFoodieSarap party tray spread"
+                >
+                  <span className="absolute top-3.5 left-3.5 rounded-full bg-forest px-2.5 py-1 text-[.55rem] font-extrabold tracking-[.13em] text-cream uppercase">
+                    Photo placeholder
+                  </span>
+                  <Icon name="cloche" className="mx-auto mb-1 h-[76px] w-[76px] text-forest opacity-65" />
+                  <span className="relative text-[.95rem] font-bold">Your handaan spread here</span>
+                  <span className="relative text-[.68rem] tracking-[.04em] text-[#5e5a48]">
+                    Swap in a real food photo · 1200 × 900px
+                  </span>
+                </div>
+              ) : (
+                <img
+                  src={BRAND.heroPhoto}
+                  alt={HERO_PHOTO_ALT}
+                  onError={() => setPhotoFailed(true)}
+                  loading="eager"
+                  decoding="async"
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+              )}
             </div>
 
             <div className="absolute -bottom-3 -left-1 flex max-w-[165px] -rotate-2 items-center gap-2 rounded-[14px] bg-white px-3 py-2 text-[.68rem] leading-tight font-bold text-forest shadow-[0_10px_24px_rgba(31,77,26,.2)] max-[400px]:max-w-[145px] max-[400px]:text-[.62rem]" aria-hidden="true">
               <Icon name="tray" className="h-5 w-5 text-orange-deep" />
-              <span>Party trays from ₱3,000</span>
+              <span>Party trays start from ₱3,000</span>
             </div>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { BILAOS, CONTACT, PACKAGES, formatPeso, messengerUrl } from '../data'
 import { Icon } from './Icons'
 import SectionHeading from './SectionHeading'
@@ -12,6 +12,33 @@ const EMPTY_FORM = {
   address: '',
   notes: '',
 }
+
+const INTEREST_GROUPS = [
+  {
+    label: 'Party tray packages',
+    options: PACKAGES.map((pkg) => ({
+      value: `Package ${pkg.id} (${formatPeso(pkg.price)})`,
+      label: `Package ${pkg.id} — ${formatPeso(pkg.price)}`,
+    })),
+  },
+  {
+    label: 'Bilao packages',
+    options: BILAOS.map((set) => ({
+      value: `Bilao Set ${set.id} (${formatPeso(set.price)} · ${set.pax})`,
+      label: `Bilao Set ${set.id} — ${formatPeso(set.price)} · ${set.pax}`,
+    })),
+  },
+  {
+    label: 'À la carte & packed meals',
+    options: [
+      { value: 'À la carte tray order', label: 'À la carte tray order' },
+      { value: 'Food packed meals', label: 'Food packed meals' },
+      { value: 'Custom order / not sure yet', label: 'Custom order / not sure yet' },
+    ],
+  },
+]
+
+const INTEREST_OPTIONS = INTEREST_GROUPS.flatMap((group) => group.options)
 
 const pad = (value) => String(value).padStart(2, '0')
 
@@ -116,7 +143,29 @@ export default function InquiryForm() {
   const [message, setMessage] = useState('')
   const [showOutput, setShowOutput] = useState(false)
   const [copyLabel, setCopyLabel] = useState('Copy message')
+  const [interestOpen, setInterestOpen] = useState(false)
+  const [activeInterest, setActiveInterest] = useState(-1)
   const formRef = useRef(null)
+  const interestRef = useRef(null)
+  const interestButtonRef = useRef(null)
+  const interestListRef = useRef(null)
+
+  useEffect(() => {
+    if (!interestOpen) return undefined
+
+    const handlePointerDown = (event) => {
+      if (!interestRef.current?.contains(event.target)) setInterestOpen(false)
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown)
+    return () => document.removeEventListener('pointerdown', handlePointerDown)
+  }, [interestOpen])
+
+  useEffect(() => {
+    if (!interestOpen || activeInterest < 0) return undefined
+    const option = interestListRef.current?.querySelector(`[data-index="${activeInterest}"]`)
+    option?.scrollIntoView({ block: 'nearest' })
+  }, [interestOpen, activeInterest])
 
   const inputClass = (name) =>
     `min-h-12 w-full rounded-xl border-2 px-3 py-2.5 font-body text-[.88rem] leading-snug transition focus:bg-white focus:outline-none focus:ring-4 ${
@@ -134,6 +183,76 @@ export default function InquiryForm() {
       delete next[name]
       return next
     })
+  }
+
+  const selectedInterestLabel =
+    INTEREST_OPTIONS.find((option) => option.value === values.interest)?.label ?? ''
+
+  const openInterest = (preferredIndex = 0) => {
+    const selectedIndex = INTEREST_OPTIONS.findIndex((option) => option.value === values.interest)
+    setInterestOpen(true)
+    setActiveInterest(selectedIndex >= 0 ? selectedIndex : preferredIndex)
+  }
+
+  const closeInterest = () => {
+    setInterestOpen(false)
+    setActiveInterest(-1)
+  }
+
+  const selectInterest = (index) => {
+    const option = INTEREST_OPTIONS[index]
+    if (!option) return
+    setValues((current) => ({ ...current, interest: option.value }))
+    setErrors((current) => {
+      if (!current.interest) return current
+      const next = { ...current }
+      delete next.interest
+      return next
+    })
+    closeInterest()
+    interestButtonRef.current?.focus()
+  }
+
+  const handleInterestKeyDown = (event) => {
+    const lastIndex = INTEREST_OPTIONS.length - 1
+
+    if (event.key === 'Escape') {
+      if (interestOpen) {
+        event.preventDefault()
+        closeInterest()
+      }
+      return
+    }
+
+    if (!interestOpen) {
+      if (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault()
+        openInterest(0)
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault()
+        openInterest(lastIndex)
+      }
+      return
+    }
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault()
+      setActiveInterest((current) => Math.min(current + 1, lastIndex))
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault()
+      setActiveInterest((current) => Math.max(current - 1, 0))
+    } else if (event.key === 'Home') {
+      event.preventDefault()
+      setActiveInterest(0)
+    } else if (event.key === 'End') {
+      event.preventDefault()
+      setActiveInterest(lastIndex)
+    } else if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      selectInterest(activeInterest)
+    } else if (event.key === 'Tab') {
+      closeInterest()
+    }
   }
 
   const handleSubmit = (event) => {
@@ -203,12 +322,12 @@ export default function InquiryForm() {
         <div className="reveal">
           <SectionHeading eyebrow="Inquiry" title="Tell Us About Your Handaan">
             Fill this out and we&apos;ll open Messenger or your email app with your details ready to
-            send. No account needed, no backend — just hit send.
+            send. 
           </SectionHeading>
         </div>
 
         <div className="grid gap-5 lg:grid-cols-[.85fr_1.15fr] lg:items-start">
-          <aside className="order-2 rounded-[26px] bg-forest p-5 text-cream shadow-[0_10px_30px_rgba(31,77,26,.18)] lg:order-1 lg:p-6">
+          <aside className="order-2 rounded-[26px] bg-forest p-5 text-cream shadow-[0_10px_30px_rgba(31,77,26,.18)] lg:order-1 lg:sticky lg:top-[95px] lg:p-6">
             <span
               className="mb-3 grid h-[52px] w-[52px] place-items-center rounded-full bg-cream/10 text-cream shadow-[inset_0_0_0_2px_rgba(249,178,51,.7)]"
               aria-hidden="true"
@@ -334,42 +453,88 @@ export default function InquiryForm() {
                   error={errors.interest}
                   full
                 >
-                  <select
-                    id="f-interest"
-                    name="interest"
-                    value={values.interest}
-                    onChange={handleChange}
-                    aria-invalid={Boolean(errors.interest)}
-                    aria-describedby="err-interest"
-                    className={inputClass('interest')}
-                  >
-                    <option value="">Choose one…</option>
-                    <optgroup label="Party tray packages">
-                      {PACKAGES.map((pkg) => {
-                        const value = `Package ${pkg.id} (${formatPeso(pkg.price)})`
-                        return (
-                          <option key={pkg.id} value={value}>
-                            Package {pkg.id} — {formatPeso(pkg.price)}
-                          </option>
-                        )
-                      })}
-                    </optgroup>
-                    <optgroup label="Bilao packages">
-                      {BILAOS.map((set) => {
-                        const value = `Bilao Set ${set.id} (${formatPeso(set.price)} · ${set.pax})`
-                        return (
-                          <option key={set.id} value={value}>
-                            Bilao Set {set.id} — {formatPeso(set.price)} · {set.pax}
-                          </option>
-                        )
-                      })}
-                    </optgroup>
-                    <optgroup label="À la carte & packed meals">
-                      <option value="À la carte tray order">À la carte tray order</option>
-                      <option value="Food packed meals">Food packed meals</option>
-                      <option value="Custom order / not sure yet">Custom order / not sure yet</option>
-                    </optgroup>
-                  </select>
+                  <div ref={interestRef} className="relative">
+                    <button
+                      ref={interestButtonRef}
+                      id="f-interest"
+                      name="interest"
+                      type="button"
+                      role="combobox"
+                      aria-expanded={interestOpen}
+                      aria-controls="f-interest-listbox"
+                      aria-haspopup="listbox"
+                      aria-activedescendant={
+                        interestOpen && activeInterest >= 0
+                          ? `f-interest-opt-${activeInterest}`
+                          : undefined
+                      }
+                      aria-invalid={Boolean(errors.interest)}
+                      aria-describedby="err-interest"
+                      onClick={() => {
+                        if (interestOpen) {
+                          closeInterest()
+                        } else {
+                          openInterest(0)
+                        }
+                      }}
+                      onKeyDown={handleInterestKeyDown}
+                      className={`${inputClass('interest')} flex items-center justify-between gap-2 text-left ${
+                        values.interest ? 'text-ink' : 'text-muted'
+                      }`}
+                    >
+                      <span className="truncate">{selectedInterestLabel || 'Choose one…'}</span>
+                      <Icon
+                        name="arrow"
+                        className={`h-4 w-4 shrink-0 transition-transform duration-200 ${
+                          interestOpen ? '-rotate-90' : 'rotate-90'
+                        }`}
+                      />
+                    </button>
+
+                    {interestOpen && (
+                      <div
+                        ref={interestListRef}
+                        id="f-interest-listbox"
+                        role="listbox"
+                        aria-label="Package or order interest"
+                        className="no-scrollbar absolute top-full left-[-10px] z-30 mt-1 max-h-[280px] w-[calc(100%+10px)] overflow-y-auto rounded-xl border-2 border-forest/20 bg-paper p-1 shadow-[0_16px_34px_rgba(18,51,15,.22)]"
+                      >
+                        {INTEREST_GROUPS.map((group) => (
+                          <div key={group.label} role="group" aria-label={group.label}>
+                            <p className="px-2.5 pt-2 pb-1 text-[.58rem] font-extrabold tracking-[.11em] text-muted uppercase">
+                              {group.label}
+                            </p>
+                            {group.options.map((option) => {
+                              const index = INTEREST_OPTIONS.indexOf(option)
+                              const isActive = activeInterest === index
+                              const isSelected = values.interest === option.value
+                              return (
+                                <div
+                                  key={option.value}
+                                  id={`f-interest-opt-${index}`}
+                                  data-index={index}
+                                  role="option"
+                                  aria-selected={isSelected}
+                                  onMouseDown={(event) => event.preventDefault()}
+                                  onMouseEnter={() => setActiveInterest(index)}
+                                  onClick={() => selectInterest(index)}
+                                  className={`flex min-h-[40px] cursor-pointer items-center rounded-lg px-2.5 py-2 text-[.82rem] leading-snug transition-colors ${
+                                    isActive
+                                      ? 'bg-forest text-white'
+                                      : isSelected
+                                        ? 'bg-forest/10 font-semibold text-forest'
+                                        : 'text-ink hover:bg-forest/5'
+                                  }`}
+                                >
+                                  {option.label}
+                                </div>
+                              )
+                            })}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </FormField>
 
                 <FormField id="f-address" name="address" label="Delivery address" required error={errors.address} full>
@@ -424,7 +589,7 @@ export default function InquiryForm() {
                 {status}
               </p>
               <p className="mt-1.5 text-[.67rem] leading-relaxed text-muted">
-                This form opens your own Messenger or email app — nothing is stored on this website.
+                This form opens your own Messenger or email app.
                 You can also call or text{' '}
                 <a href={`tel:${CONTACT.phoneTel}`} className="font-semibold text-forest underline">
                   {CONTACT.phoneDisplay}

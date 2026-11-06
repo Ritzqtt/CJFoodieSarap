@@ -11,7 +11,7 @@ export default function Footer() {
       <div className="pointer-events-none absolute -top-24 right-0 h-72 w-72 rounded-full bg-gold/10 blur-3xl" aria-hidden="true" />
 
       <div className="wrap relative">
-        <div className="grid gap-7 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.1fr] lg:gap-8">
+        <div className="flex flex-col items-center gap-7 text-center lg:grid lg:grid-cols-[1.4fr_1fr_1fr_1.1fr] lg:items-start lg:gap-8 lg:text-left">
           <div>
             <a href="#home" className="inline-flex items-center gap-2.5 no-underline" aria-label="CJFoodieSarap — back to top">
               <img
@@ -55,7 +55,7 @@ export default function Footer() {
             </div>
           </div>
 
-          <div>
+          <div className="hidden lg:block">
             <h3 className="mb-2.5 text-[.62rem] font-extrabold tracking-[.16em] text-gold uppercase">
               Quick Links
             </h3>
@@ -71,7 +71,7 @@ export default function Footer() {
             </nav>
           </div>
 
-          <div>
+          <div className="hidden lg:block">
             <h3 className="mb-2.5 text-[.62rem] font-extrabold tracking-[.16em] text-gold uppercase">
               Popular
             </h3>

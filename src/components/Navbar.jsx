@@ -68,7 +68,7 @@ export default function Navbar() {
 
         <div className="flex shrink-0 items-center gap-1.5">
           <a
-            className="btn btn-primary min-h-[42px] px-3.5 py-2 text-[.8rem]"
+            className="btn btn-primary hidden min-h-[42px] px-3.5 py-2 text-[.8rem] lg:inline-flex"
             href={messengerUrl(BOOK_MESSAGE)}
             target="_blank"
             rel="noopener noreferrer"
@@ -77,7 +77,7 @@ export default function Navbar() {
           </a>
           <button
             type="button"
-            className="grid h-11 w-11 place-items-center rounded-[13px] border-2 border-forest/15 bg-white text-forest lg:hidden"
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-[13px] border-2 border-forest/15 bg-white text-forest lg:hidden"
             aria-expanded={open}
             aria-controls="mobile-nav"
             aria-label={open ? 'Close menu' : 'Open menu'}

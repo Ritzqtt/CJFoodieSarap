@@ -79,15 +79,23 @@ export default function Contact() {
                   Hours
                 </span>
                 <span className="block text-[.88rem] leading-snug font-bold text-forest">{CONTACT.hours}</span>
-                <span className="block text-[.64rem] font-medium text-muted">
-                  Facebook lists us as &quot;Always open&quot; — please message ahead to confirm.
-                </span>
+                <span className="block text-[.64rem] font-medium text-muted">{CONTACT.hoursNote}</span>
               </span>
             </div>
 
-            <p className="mt-2 inline-flex items-center gap-2 rounded-full border-[1.5px] border-dashed border-[#c98a12] bg-[#fff3d6] px-3 py-1.5 text-[.67rem] font-bold text-[#6b4300]">
-              <Icon name="truck" className="h-4 w-4" /> Free delivery in Makati &amp; Taguig
-            </p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <span className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-dashed border-[#c98a12] bg-[#fff3d6] px-3 py-1.5 text-[.67rem] font-bold text-[#6b4300]">
+                <Icon name="truck" className="h-4 w-4" /> Free delivery in Makati &amp; Taguig
+              </span>
+              {CONTACT.services.map((service) => (
+                <span
+                  key={service.label}
+                  className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-dashed border-[#c98a12] bg-[#fff3d6] px-3 py-1.5 text-[.67rem] font-bold text-[#6b4300]"
+                >
+                  <Icon name={service.icon} className="h-4 w-4" /> {service.label}
+                </span>
+              ))}
+            </div>
 
             <div className="mt-3 grid grid-cols-2 gap-2" aria-label="Social media links">
               {SOCIALS.map((social) => (
