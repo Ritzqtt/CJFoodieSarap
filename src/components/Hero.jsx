@@ -3,7 +3,7 @@ import { BRAND, HERO_TILES, messengerUrl } from '../data'
 import { Icon } from './Icons'
 
 const BOOK_MESSAGE =
-  "Hello po! I'd like to book an order. Here's what I'm planning:"
+  "Hello po! I'd like to book an order."
 
 const HERO_PHOTO_ALT =
   'CJFoodieSarap handaan spread with party trays of beef, lumpia, lechon, rice, and vegetables'

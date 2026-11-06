@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { BRAND, CONTACT, NAV_LINKS, messengerUrl } from '../data'
 
 const BOOK_MESSAGE =
-  "Hi! I'd like to book a handaan order. Can you help me choose a package?"
+  "Hello po! I'd like to book an order."
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)

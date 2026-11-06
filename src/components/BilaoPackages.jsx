@@ -68,14 +68,6 @@ export default function BilaoPackages() {
             </article>
           ))}
         </div>
-
-        <p className="reveal mx-auto mt-8 max-w-3xl text-center text-[.8rem] text-[#dce7cf]">
-          Want a different bilao combination?{' '}
-          <a href="#inquire" className="font-bold text-gold underline decoration-gold/50 underline-offset-2">
-            Message us
-          </a>{' '}
-          — we can mix and match.
-        </p>
       </div>
     </section>
   )
