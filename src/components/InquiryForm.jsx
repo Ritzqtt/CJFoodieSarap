@@ -57,7 +57,7 @@ function validate(values) {
 
   const digits = values.mobile.replace(/\D/g, '')
   if (!/^(09\d{9}|639\d{9})$/.test(digits)) {
-    errors.mobile = 'Enter a valid PH mobile number, e.g. 0917 123 4567.'
+    errors.mobile = 'Enter a valid PH mobile number, e.g. 09123456789.'
   }
 
   if (!values.date) {
@@ -352,7 +352,7 @@ export default function InquiryForm() {
                     name="name"
                     type="text"
                     autoComplete="name"
-                    placeholder="Juan Dela Cruz"
+                    placeholder="Firstname Lastname"
                     value={values.name}
                     onChange={handleChange}
                     aria-invalid={Boolean(errors.name)}
@@ -368,7 +368,7 @@ export default function InquiryForm() {
                     type="tel"
                     inputMode="tel"
                     autoComplete="tel"
-                    placeholder="0917 123 4567"
+                    placeholder="09123456789"
                     value={values.mobile}
                     onChange={handleChange}
                     aria-invalid={Boolean(errors.mobile)}
