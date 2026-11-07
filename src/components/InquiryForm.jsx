@@ -286,7 +286,7 @@ export default function InquiryForm() {
         </div>
 
         <div className="grid gap-5 lg:grid-cols-[.85fr_1.15fr] lg:items-start">
-          <aside className="order-2 rounded-[26px] bg-forest p-5 text-cream shadow-[0_10px_30px_rgba(31,77,26,.18)] lg:order-1 lg:sticky lg:top-[95px] lg:p-6">
+          <aside className="order-1 rounded-[26px] bg-forest p-5 text-cream shadow-[0_10px_30px_rgba(31,77,26,.18)] lg:order-1 lg:sticky lg:top-[95px] lg:p-6">
             <span
               className="mb-3 grid h-[52px] w-[52px] place-items-center rounded-full bg-cream/10 text-cream shadow-[inset_0_0_0_2px_rgba(249,178,51,.7)]"
               aria-hidden="true"
@@ -326,7 +326,7 @@ export default function InquiryForm() {
                 className="flex items-center gap-2.5 rounded-xl border border-cream/20 bg-cream/5 px-3 py-2.5 text-[.78rem] font-semibold text-cream no-underline transition hover:border-gold/50 hover:bg-gold/15"
               >
                 <Icon name="messenger" className="h-[18px] w-[18px] text-gold" />
-                Message on Messenger
+                CJFoodieSarap
               </a>
             </div>
 
@@ -339,7 +339,7 @@ export default function InquiryForm() {
             </p>
           </aside>
 
-          <div className="reveal order-1 rounded-[26px] border border-forest/15 bg-paper p-4 shadow-[0_12px_32px_rgba(31,77,26,.13)] sm:p-5 lg:order-2">
+          <div className="reveal order-2 rounded-[26px] border border-forest/15 bg-paper p-4 shadow-[0_12px_32px_rgba(31,77,26,.13)] sm:p-5 lg:order-2">
             <form ref={formRef} onSubmit={handleSubmit} noValidate>
               <div className="grid gap-3.5 sm:grid-cols-2">
                 <FormField id="f-name" name="name" label="Your name" required error={errors.name}>
