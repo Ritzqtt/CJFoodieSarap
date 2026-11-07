@@ -16,8 +16,20 @@ export const BRAND = {
   ],
   cta: "Let's go, Kafoodies!",
   logo: '/logo.png',
-  heroPhoto: '/photo.jpg',
 }
+
+export const heroPhotos = [
+  { src: '/images/hero/photo-1.jpg', alt: 'Packed meals arranged in a tray' },
+  { src: '/images/hero/photo-2.jpg', alt: 'Crispy pork belly with a golden crackling crust' },
+  { src: '/images/hero/photo-3.jpg', alt: 'Beef and vegetable stir-fry' },
+  { src: '/images/hero/photo-4.jpg', alt: 'Mixed vegetables with quail eggs' },
+  { src: '/images/hero/photo-5.jpg', alt: 'Fish fingers served with dip' },
+  { src: '/images/hero/photo-6.jpg', alt: 'Cheesy pasta' },
+  { src: '/images/hero/photo-7.jpg', alt: 'Fried chicken pieces' },
+  { src: '/images/hero/photo-8.jpg', alt: 'Pork sisig' },
+  { src: '/images/hero/photo-9.jpg', alt: 'Creamy beef and mushrooms with potatoes' },
+  { src: '/images/hero/photo-10.jpg', alt: 'Beef caldereta' },
+]
 
 export const CONTACT = {
   phoneDisplay: '0976 068 4951',

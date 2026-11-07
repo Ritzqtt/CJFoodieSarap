@@ -1,13 +1,314 @@
-import { useState } from 'react'
-import { BRAND, HERO_TILES, messengerUrl } from '../data'
+import { useEffect, useRef, useState } from 'react'
+import { BRAND, HERO_TILES, heroPhotos, messengerUrl } from '../data'
 import { BOOK_MESSAGE } from '../lib/messages'
 import { Icon } from './Icons'
 
-const HERO_PHOTO_ALT =
-  'CJFoodieSarap handaan spread with party trays of beef, lumpia, lechon, rice, and vegetables'
+const PHOTO_TRANSITION_MS = 600
+const PHOTO_EXIT_MS = 325
+const PHOTO_SLOT_STAGGER_MS = 25
+const PHOTO_ANIMATION_MS = PHOTO_TRANSITION_MS + 7 * PHOTO_SLOT_STAGGER_MS
+const PHOTO_INTRO_STAGGER_MS = 40
+const STACK_SCALE = 1
+const PHOTO_ZOOM = 1.06
+
+const PHOTO_STACK_SLOTS = [
+  {
+    x: '0%',
+    y: '0%',
+    rotation: '0deg',
+    scale: STACK_SCALE,
+    opacity: 1,
+    shade: 0,
+    intro: 'translate(0, -8%) rotate(0deg) scale(.96)',
+  },
+  {
+    x: '-0.6%',
+    y: '0.6%',
+    rotation: '-4.2deg',
+    scale: 0.96,
+    opacity: 0.97,
+    shade: 0.04,
+    intro: 'translate(-8%, 7%) rotate(-24deg) scale(.72)',
+  },
+  {
+    x: '0.6%',
+    y: '-0.6%',
+    rotation: '3.6deg',
+    scale: 0.94,
+    opacity: 0.94,
+    shade: 0.07,
+    intro: 'translate(8%, -7%) rotate(23deg) scale(.72)',
+  },
+  {
+    x: '-0.6%',
+    y: '0.6%',
+    rotation: '-7.2deg',
+    scale: 0.9,
+    opacity: 0.91,
+    shade: 0.1,
+    intro: 'translate(-8%, 7%) rotate(-30deg) scale(.69)',
+  },
+  {
+    x: '0.6%',
+    y: '-0.6%',
+    rotation: '7.8deg',
+    scale: 0.89,
+    opacity: 0.88,
+    shade: 0.13,
+    intro: 'translate(8%, -7%) rotate(32deg) scale(.69)',
+  },
+  {
+    x: '-0.6%',
+    y: '0.6%',
+    rotation: '-3deg',
+    scale: 0.91,
+    opacity: 0.85,
+    shade: 0.16,
+    intro: 'translate(-7%, 8%) rotate(-22deg) scale(.73)',
+  },
+  {
+    x: '0.6%',
+    y: '0.6%',
+    rotation: '6deg',
+    scale: 0.88,
+    opacity: 0.82,
+    shade: 0.18,
+    intro: 'translate(8%, 7%) rotate(29deg) scale(.7)',
+  },
+  {
+    x: '-0.6%',
+    y: '-0.6%',
+    rotation: '-6.6deg',
+    scale: 0.87,
+    opacity: 0.8,
+    shade: 0.2,
+    intro: 'translate(-8%, -7%) rotate(-31deg) scale(.68)',
+  },
+]
 
 export default function Hero() {
-  const [photoFailed, setPhotoFailed] = useState(false)
+  const [stackState, setStackState] = useState(() => ({
+    order: heroPhotos,
+    exitingId: null,
+    exitPhase: 'idle',
+    exitX: '45%',
+    exitRotation: '12deg',
+  }))
+  const [isDragging, setIsDragging] = useState(false)
+  const [isReturning, setIsReturning] = useState(false)
+  const [hasInteracted, setHasInteracted] = useState(false)
+  const [introState, setIntroState] = useState('pending')
+  const isAnimatingRef = useRef(false)
+  const queuedClickRef = useRef(false)
+  const pointerStartRef = useRef(null)
+  const suppressClickRef = useRef(false)
+  const suppressClickTimerRef = useRef(null)
+  const dragReturnTimerRef = useRef(null)
+  const animationTimersRef = useRef([])
+  const topCardRef = useRef(null)
+  const stackRef = useRef(null)
+  const restoreFocusRef = useRef(false)
+  const stackStateRef = useRef(stackState)
+  const photoOrder = stackState.order
+  const currentPhoto = photoOrder[0]
+  const currentPosition = heroPhotos.indexOf(currentPhoto) + 1
+
+  useEffect(() => {
+    const stack = stackRef.current
+    if (!stack) return undefined
+
+    let introTimer
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return
+
+      observer.disconnect()
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        setIntroState('done')
+        return
+      }
+
+      setIntroState('running')
+      introTimer = window.setTimeout(() => setIntroState('done'), 760)
+    }, { threshold: 0.2 })
+
+    observer.observe(stack)
+
+    return () => {
+      observer.disconnect()
+      window.clearTimeout(introTimer)
+    }
+  }, [])
+
+  useEffect(() => {
+    heroPhotos.forEach((photo) => {
+      const image = new Image()
+      image.src = photo.src
+      image.decode().catch((error) => {
+        console.error(`Could not preload hero photo: ${photo.src}`, error)
+      })
+    })
+
+    return () => {
+      animationTimersRef.current.forEach((timer) => window.clearTimeout(timer))
+      window.clearTimeout(suppressClickTimerRef.current)
+      window.clearTimeout(dragReturnTimerRef.current)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (restoreFocusRef.current) {
+      topCardRef.current?.focus({ preventScroll: true })
+      restoreFocusRef.current = false
+    }
+  }, [photoOrder])
+
+  const showNextPhoto = (exitX = '45%', exitRotation = '12deg', leavingCard = null) => {
+    if (isAnimatingRef.current) {
+      leavingCard?.style.removeProperty('--drag-x')
+      leavingCard?.style.removeProperty('--drag-rotation')
+      queuedClickRef.current = true
+      return
+    }
+
+    isAnimatingRef.current = true
+    setIntroState('done')
+    restoreFocusRef.current = document.activeElement === topCardRef.current
+    setHasInteracted(true)
+    const currentStack = stackStateRef.current
+    const outgoingPhoto = currentStack.order[0]
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const nextStack = {
+      ...currentStack,
+      order: [...currentStack.order.slice(1), outgoingPhoto],
+      exitingId: outgoingPhoto.src,
+      exitPhase: 'fly',
+      exitX: reducedMotion ? '0%' : exitX,
+      exitRotation: reducedMotion ? '0deg' : exitRotation,
+    }
+
+    stackStateRef.current = nextStack
+    setStackState(nextStack)
+    const scheduleAnimation = (callback, delay) => {
+      let timer
+      timer = window.setTimeout(() => {
+        animationTimersRef.current = animationTimersRef.current.filter((item) => item !== timer)
+        callback()
+      }, delay)
+      animationTimersRef.current.push(timer)
+    }
+
+    if (reducedMotion) {
+      scheduleAnimation(() => {
+        leavingCard?.style.removeProperty('--drag-x')
+        leavingCard?.style.removeProperty('--drag-rotation')
+        const finishedStack = {
+          ...stackStateRef.current,
+          exitingId: null,
+          exitPhase: 'idle',
+        }
+        stackStateRef.current = finishedStack
+        setStackState(finishedStack)
+        isAnimatingRef.current = false
+        if (queuedClickRef.current) {
+          queuedClickRef.current = false
+          showNextPhoto()
+        }
+      }, 200)
+      return
+    }
+
+    scheduleAnimation(() => {
+      const settledStack = { ...stackStateRef.current, exitPhase: 'settle' }
+      stackStateRef.current = settledStack
+      setStackState(settledStack)
+    }, PHOTO_EXIT_MS)
+    scheduleAnimation(() => {
+      leavingCard?.style.removeProperty('--drag-x')
+      leavingCard?.style.removeProperty('--drag-rotation')
+      const finishedStack = {
+        ...stackStateRef.current,
+        exitingId: null,
+        exitPhase: 'idle',
+      }
+      stackStateRef.current = finishedStack
+      setStackState(finishedStack)
+      isAnimatingRef.current = false
+      if (queuedClickRef.current) {
+        queuedClickRef.current = false
+        showNextPhoto()
+      }
+    }, PHOTO_ANIMATION_MS)
+  }
+
+  const handleClick = () => {
+    if (suppressClickRef.current) {
+      suppressClickRef.current = false
+      window.clearTimeout(suppressClickTimerRef.current)
+      return
+    }
+
+    showNextPhoto()
+  }
+
+  const handlePointerDown = (event) => {
+    if (event.pointerType === 'mouse') return
+
+    pointerStartRef.current = { x: event.clientX, y: event.clientY }
+    setIsReturning(false)
+    setIsDragging(true)
+    event.currentTarget.setPointerCapture(event.pointerId)
+  }
+
+  const handlePointerMove = (event) => {
+    const start = pointerStartRef.current
+    if (!start || !isDragging) return
+
+    const deltaX = event.clientX - start.x
+    const deltaY = event.clientY - start.y
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      topCardRef.current?.style.setProperty('--drag-x', `${deltaX}px`)
+      topCardRef.current?.style.setProperty('--drag-rotation', `${deltaX * 0.035}deg`)
+    }
+  }
+
+  const handlePointerUp = (event) => {
+    const start = pointerStartRef.current
+    pointerStartRef.current = null
+
+    if (!start) return
+
+    const deltaX = event.clientX - start.x
+    const deltaY = event.clientY - start.y
+    const isHorizontalDrag = Math.abs(deltaX) > Math.abs(deltaY)
+    const dragged = isHorizontalDrag && Math.abs(deltaX) >= 8
+    const shouldAdvance = isHorizontalDrag && Math.abs(deltaX) >= 40
+
+    if (dragged) {
+      suppressClickRef.current = true
+      window.clearTimeout(suppressClickTimerRef.current)
+      suppressClickTimerRef.current = window.setTimeout(() => {
+        suppressClickRef.current = false
+      }, 500)
+    }
+
+    if (shouldAdvance) {
+      showNextPhoto(
+        deltaX < 0 ? '-45%' : '45%',
+        deltaX < 0 ? '-12deg' : '12deg',
+        event.currentTarget,
+      )
+    } else {
+      topCardRef.current?.style.setProperty('--drag-x', '0px')
+      topCardRef.current?.style.setProperty('--drag-rotation', '0deg')
+      if (dragged) {
+        setIsReturning(true)
+        window.clearTimeout(dragReturnTimerRef.current)
+        dragReturnTimerRef.current = window.setTimeout(() => setIsReturning(false), 260)
+      }
+    }
+
+    setIsDragging(false)
+  }
 
   return (
     <section id="home" className="relative overflow-hidden bg-cream pt-8 pb-10 sm:pt-12 sm:pb-14 lg:pt-16 lg:pb-16">
@@ -85,35 +386,88 @@ export default function Hero() {
 
           <div className="reveal relative mx-auto w-full max-w-[470px]" style={{ transitionDelay: '120ms' }}>
             <div
-              className={`photo-ph relative aspect-[5/4] lg:aspect-[1/.92] ${
-                photoFailed ? '' : '[&::before]:hidden'
-              }`}
+              ref={stackRef}
+              className={`photo-ph hero-photo-stack [&::before]:hidden aspect-[5/4] lg:aspect-[1/.92] ${
+                hasInteracted ? 'has-interacted' : ''
+              } intro-${introState}`}
             >
-              {photoFailed ? (
-                <div
-                  className="grid h-full place-content-center gap-1 p-6 text-center text-[#46543a]"
-                  role="img"
-                  aria-label="Placeholder for a photo of a CJFoodieSarap party tray spread"
-                >
-                  <span className="absolute top-3.5 left-3.5 rounded-full bg-forest px-2.5 py-1 text-[.55rem] font-extrabold tracking-[.13em] text-cream uppercase">
-                    Photo placeholder
-                  </span>
-                  <Icon name="cloche" className="mx-auto mb-1 h-[76px] w-[76px] text-forest opacity-65" />
-                  <span className="relative text-[.95rem] font-bold">Your handaan spread here</span>
-                  <span className="relative text-[.68rem] tracking-[.04em] text-[#5e5a48]">
-                    Swap in a real food photo · 1200 × 900px
-                  </span>
-                </div>
-              ) : (
-                <img
-                  src={BRAND.heroPhoto}
-                  alt={HERO_PHOTO_ALT}
-                  onError={() => setPhotoFailed(true)}
-                  loading="eager"
-                  decoding="async"
-                  className="absolute inset-0 h-full w-full object-cover"
-                />
-              )}
+              <div className="hero-photo-pile">
+                {photoOrder.map((photo, layer) => {
+                  const isTop = layer === 0
+                  const slotIndex = Math.min(layer, PHOTO_STACK_SLOTS.length - 1)
+                  const slot = PHOTO_STACK_SLOTS[slotIndex]
+                  const isExiting = photo.src === stackState.exitingId
+                  const cardClassName = `hero-photo-card ${
+                    isTop ? 'cursor-pointer' : 'pointer-events-none'
+                  } ${isExiting ? 'is-exiting' : ''} ${
+                    isTop && isDragging ? 'is-dragging' : ''
+                  } ${isTop && isReturning ? 'is-returning' : ''}`
+                  const cardStyle = {
+                    '--slot-x': slot.x,
+                    '--slot-y': slot.y,
+                    '--slot-rotation': slot.rotation,
+                    '--slot-scale': slot.scale * STACK_SCALE,
+                    '--slot-opacity': slot.opacity,
+                    '--slot-shade': slot.shade,
+                    '--intro-transform': slot.intro,
+                    '--intro-delay': `${slotIndex * PHOTO_INTRO_STAGGER_MS}ms`,
+                    '--slot-delay': `${isExiting ? 0 : layer * PHOTO_SLOT_STAGGER_MS}ms`,
+                    '--slot-index': slotIndex,
+                    '--photo-zoom': PHOTO_ZOOM,
+                    '--card-radius': isTop ? '38px' : '4px',
+                    '--photo-radius': isTop ? '33px' : '2px',
+                    '--exit-x': stackState.exitX,
+                    '--exit-rotation': stackState.exitRotation,
+                  }
+
+                  const image = (
+                    <>
+                      <img
+                        src={photo.src}
+                        alt=""
+                        aria-hidden="true"
+                        loading="eager"
+                        decoding="async"
+                        className="hero-photo-card-image"
+                      />
+                      <span className="hero-photo-card-shade" />
+                    </>
+                  )
+
+                  return (
+                    <button
+                      key={photo.src}
+                      ref={isTop ? topCardRef : null}
+                      type="button"
+                      aria-label={isTop ? `Show next photo, ${currentPosition} of ${heroPhotos.length}: ${photo.alt}` : undefined}
+                      aria-hidden={!isTop}
+                      tabIndex={isTop ? 0 : -1}
+                      disabled={!isTop}
+                      data-slot={slotIndex}
+                      data-hidden={layer > 7}
+                      data-exit-phase={isExiting ? stackState.exitPhase : undefined}
+                      style={cardStyle}
+                      className={cardClassName}
+                      onClick={isTop ? handleClick : undefined}
+                      onPointerDown={isTop ? handlePointerDown : undefined}
+                      onPointerMove={isTop ? handlePointerMove : undefined}
+                      onPointerUp={isTop ? handlePointerUp : undefined}
+                      onPointerCancel={isTop ? () => {
+                        pointerStartRef.current = null
+                        topCardRef.current?.style.setProperty('--drag-x', '0px')
+                        topCardRef.current?.style.setProperty('--drag-rotation', '0deg')
+                        setIsDragging(false)
+                      } : undefined}
+                    >
+                      {image}
+                    </button>
+                  )
+                })}
+              </div>
+
+              <span className="sr-only" aria-live="polite" aria-atomic="true">
+                Photo {currentPosition} of {heroPhotos.length}
+              </span>
             </div>
 
             <div className="absolute -bottom-3 -left-1 flex max-w-[165px] -rotate-2 items-center gap-2 rounded-[14px] bg-white px-3 py-2 text-[.68rem] leading-tight font-bold text-forest shadow-[0_10px_24px_rgba(31,77,26,.2)] max-[400px]:max-w-[145px] max-[400px]:text-[.62rem]" aria-hidden="true">

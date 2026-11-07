@@ -40,7 +40,7 @@ Prices are plain numbers in Philippine pesos and are formatted with `formatPeso(
 
 ### Before going live
 
-1. **Photos** — replace every placeholder marked `Photo placeholder`, `Photo`, or `Replace with your photo`. The hero photo is `BRAND.heroPhoto` (`public/photo.jpg`); swap that file to change it.
+1. **Photos** — replace every placeholder marked `Photo placeholder`, `Photo`, or `Replace with your photo`. Hero photos are listed in `src/data.js` and stored in `public/images/hero/`.
 2. **Hours** — `CONTACT.hours` is set to `Always open` and `CONTACT.hoursNote` to `Message us to book your date`. Update both if the schedule or wording changes.
 3. **Map** — the Contact section uses a real Google Maps embed; update `CONTACT.mapEmbedUrl` and `CONTACT.mapLink` if the location changes.
 4. **Social preview image** — add a real 1200×630 photo as `public/og-image.jpg` (the Open Graph tag in `index.html` points to `og-image.jpg`).
