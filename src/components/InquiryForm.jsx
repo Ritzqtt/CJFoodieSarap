@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { BILAOS, CONTACT, PACKAGES, formatPeso, messengerUrl } from '../data'
+import { BILAOS, BRAND, CONTACT, PACKAGES, formatPeso, messengerUrl } from '../data'
 import { buildInquiryMessage, copyTextToClipboard, formatDate } from '../lib/messages'
 import { Icon } from './Icons'
 import SectionHeading from './SectionHeading'
@@ -287,11 +287,15 @@ export default function InquiryForm() {
 
         <div className="grid gap-5 lg:grid-cols-[.85fr_1.15fr] lg:items-start">
           <aside className="order-1 rounded-[26px] bg-forest p-5 text-cream shadow-[0_10px_30px_rgba(31,77,26,.18)] lg:order-1 lg:sticky lg:top-[95px] lg:p-6">
-            <span
-              className="mb-3 grid h-[52px] w-[52px] place-items-center rounded-full bg-cream/10 text-cream shadow-[inset_0_0_0_2px_rgba(249,178,51,.7)]"
-              aria-hidden="true"
-            >
-              <Icon name="cloche" className="h-8 w-8" />
+            <span className="mb-3 grid h-[52px] w-[52px] place-items-center rounded-full bg-cream/10 text-cream shadow-[inset_0_0_0_2px_rgba(249,178,51,.7)]">
+              <img
+                src={BRAND.logo}
+                alt="CJFoodieSarap logo"
+                width={40}
+                height={40}
+                loading="lazy"
+                className="h-10 w-auto max-w-full object-contain"
+              />
             </span>
             <h3 className="mb-1.5 font-display text-[2rem] leading-[.95] tracking-[.03em] text-white">
               Let&apos;s go, Kafoodies!
