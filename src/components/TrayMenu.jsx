@@ -476,13 +476,13 @@ export default function TrayMenu() {
               return (
                 <label
                   key={dish}
-                  className={`flex cursor-pointer items-start justify-between gap-2.5 rounded-[14px] border px-3.5 py-2.5 transition ${
+                  className={`flex cursor-pointer items-center justify-between gap-2.5 rounded-[14px] border px-3.5 py-2.5 transition ${
                     checked
                       ? 'border-forest/45 bg-[#eff8e9] shadow-[0_3px_10px_rgba(31,77,26,.1)]'
                       : 'border-forest/15 bg-white hover:-translate-y-px hover:border-orange/55 hover:shadow-[0_5px_14px_rgba(31,77,26,.08)]'
                   }`}
                 >
-                  <span className="flex min-w-0 items-start gap-2.5">
+                  <span className="flex min-w-0 items-center gap-2.5">
                     <input
                       type="checkbox"
                       className="peer sr-only"
@@ -492,7 +492,7 @@ export default function TrayMenu() {
                     />
                     <span
                       aria-hidden="true"
-                      className={`mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-[6px] border-2 transition peer-focus-visible:ring-4 peer-focus-visible:ring-orange/35 peer-focus-visible:ring-offset-1 ${
+                      className={`grid h-5 w-5 shrink-0 place-items-center rounded-[6px] border-2 transition peer-focus-visible:ring-4 peer-focus-visible:ring-orange/35 peer-focus-visible:ring-offset-1 ${
                         checked
                           ? 'border-forest bg-forest text-white'
                           : 'border-forest/30 bg-white text-transparent'
@@ -501,7 +501,7 @@ export default function TrayMenu() {
                       {checked && <Icon name="check" className="h-3.5 w-3.5" />}
                     </span>
                     <span className="min-w-0">
-                      <span className="block text-[.86rem] leading-snug font-semibold text-ink">
+                      <span className="block text-[.86rem] leading-tight font-semibold text-ink">
                         {dish}
                       </span>
                       {category.notes?.[dish] && (

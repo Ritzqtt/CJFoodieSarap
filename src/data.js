@@ -112,7 +112,6 @@ export const MENU_CATEGORIES = [
       'Pork Steak',
       'Bagnet',
     ],
-    notes: { 'Pork BBQ': 'Also available at ₱30 per stick' },
   },
   {
     id: 'chicken',
