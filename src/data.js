@@ -244,12 +244,50 @@ export const MENU_CATEGORIES = [
       'Fruit Salad',
       'Macaroni Salad',
     ],
-    extras: [
-      { name: 'Salad in cups', price: 30, unit: 'each' },
-      { name: 'Puto Cheese', price: 15, unit: 'each' },
-    ],
   },
 ]
+
+/* ---------- Per-piece items that can be added to an order ---------- */
+export const ORDER_SPECIALS = [
+  {
+    id: 'pork-bbq-stick',
+    categoryId: 'pork',
+    name: 'Pork BBQ',
+    displayName: 'Pork BBQ (per stick)',
+    price: 30,
+    unit: 'per stick',
+    quantityLabel: 'sticks',
+    messageUnit: 'sticks',
+    defaultQuantity: 10,
+  },
+  {
+    id: 'salad-cups',
+    categoryId: 'desserts',
+    name: 'Salad in cups',
+    displayName: 'Salad in cups',
+    price: 30,
+    unit: 'each',
+    quantityLabel: 'pieces',
+    defaultQuantity: 1,
+  },
+  {
+    id: 'puto-cheese',
+    categoryId: 'desserts',
+    name: 'Puto Cheese',
+    displayName: 'Puto Cheese',
+    price: 15,
+    unit: 'each',
+    quantityLabel: 'pieces',
+    defaultQuantity: 1,
+  },
+]
+
+/* ---------- Order summary copy ---------- */
+export const ORDER_COPY = {
+  title: 'Your Order',
+  empty: "Tick the dishes you want and they'll show up here.",
+  note: 'Prices are for trays only. Free delivery in Makati & Taguig. Final total is confirmed on Messenger.',
+}
 
 /* ---------- Party tray packages (all include free softdrinks) ---------- */
 export const PACKAGES = [

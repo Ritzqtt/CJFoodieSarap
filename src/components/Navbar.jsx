@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react'
 import { BRAND, CONTACT, NAV_LINKS, messengerUrl } from '../data'
-
-const BOOK_MESSAGE =
-  "Hello po! I'd like to book an order."
+import { BOOK_MESSAGE } from '../lib/messages'
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)

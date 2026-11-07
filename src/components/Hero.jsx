@@ -1,9 +1,7 @@
 import { useState } from 'react'
 import { BRAND, HERO_TILES, messengerUrl } from '../data'
+import { BOOK_MESSAGE } from '../lib/messages'
 import { Icon } from './Icons'
-
-const BOOK_MESSAGE =
-  "Hello po! I'd like to book an order."
 
 const HERO_PHOTO_ALT =
   'CJFoodieSarap handaan spread with party trays of beef, lumpia, lechon, rice, and vegetables'
