@@ -571,7 +571,7 @@ export default function TrayMenu() {
 
           <p className="mt-3.5 text-[.7rem] leading-relaxed text-muted">
             Prices are per tray. Serving sizes are estimates — message us and we will help you
-            choose the right number of trays. Pork BBQ is also available at ₱30 per stick.
+            choose the right number of trays.
           </p>
         </div>
 
