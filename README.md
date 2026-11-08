@@ -61,7 +61,7 @@ src/
     Hero.jsx                Hero, tagline, three tiles, free-delivery badge
     PartyPackages.jsx       Party tray package grid
     PackageCard.jsx         Single package card + Messenger deep link
-    TrayMenu.jsx            Category tabs + tray-size selector (live prices)
+    TrayMenu.jsx            Category tabs, tray-size selector, and interactive order summary
     BilaoPackages.jsx       Bilao set cards
     PackedMeals.jsx         Packed meal groups A–D
     HowToBook.jsx           Four booking steps + delivery note
@@ -72,6 +72,10 @@ src/
     SectionHeading.jsx      Reusable brush-stroke section heading
     Icons.jsx               Inline SVG icon sprite + <Icon /> helper
 ```
+
+## Menu ordering
+
+The à la carte menu lets visitors select dishes and available extras, choose tray sizes, and adjust item quantities. The **Your Order** card stays hidden until at least one item is selected; it then shows the selected items, quantities, and live total. Removing all items or choosing **Clear all** hides the card again. Visitors can send the completed order through Messenger. On mobile, a floating order button provides quick access when the order card is off-screen.
 
 ## Form behavior
 
