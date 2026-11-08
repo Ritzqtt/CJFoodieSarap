@@ -738,21 +738,6 @@ export default function TrayMenu() {
           Showing {category.name} tray prices for {size.label}. {category.items.length} dishes.{' '}
           {itemCount} {itemCount === 1 ? 'item' : 'items'} selected.
         </p>
-
-        <div className="reveal mt-5 flex flex-wrap items-center justify-between gap-3 rounded-[18px] border-2 border-dashed border-forest/30 bg-[#f2f8ea] px-4 py-4">
-          <p className="text-[.84rem] text-[#3e4a33]">
-            <strong className="text-forest">Can&apos;t decide?</strong> Tell us your budget, pax, and
-            favorite dishes — we&apos;ll suggest a lineup.
-          </p>
-          <a
-            className="btn btn-forest btn-sm"
-            href={messengerUrl(ASK_MESSAGE)}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Icon name="messenger" /> Ask for a suggestion
-          </a>
-        </div>
       </div>
     </section>
   )
