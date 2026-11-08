@@ -184,18 +184,6 @@ export default function TrayMenu() {
     }
   }, [])
 
-  useEffect(() => {
-    const card = orderCardRef.current
-    if (!card || typeof IntersectionObserver === 'undefined') return undefined
-
-    const observer = new IntersectionObserver(
-      ([entry]) => setOrderCardVisible(entry.isIntersecting),
-      { threshold: 0 },
-    )
-    observer.observe(card)
-    return () => observer.disconnect()
-  }, [])
-
   const category = MENU_CATEGORIES.find((item) => item.id === activeId) ?? MENU_CATEGORIES[0]
   const prices = PRICE_GROUPS[category.priceGroup]
   const size = TRAY_SIZES[sizeIndex]
@@ -329,6 +317,19 @@ export default function TrayMenu() {
     (sum, group) => sum + group.lines.reduce((groupSum, line) => groupSum + line.quantity, 0),
     0,
   )
+  const hasItems = itemCount > 0
+
+  useEffect(() => {
+    const card = orderCardRef.current
+    if (!hasItems || !card || typeof IntersectionObserver === 'undefined') return undefined
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setOrderCardVisible(entry.isIntersecting),
+      { threshold: 0 },
+    )
+    observer.observe(card)
+    return () => observer.disconnect()
+  }, [hasItems])
 
   const orderHref = useMemo(() => {
     const items = orderGroups.flatMap((group) =>
@@ -575,22 +576,17 @@ export default function TrayMenu() {
           </p>
         </div>
 
-        <div
-          ref={orderCardRef}
-          id="your-order"
-          className="reveal mt-5 scroll-mt-[84px] rounded-[26px] border border-forest/15 bg-paper p-4 shadow-[0_8px_28px_rgba(31,77,26,.07)] sm:p-5 lg:scroll-mt-[88px]"
-        >
-          <div className="mb-3.5 border-b-2 border-dashed border-forest/20 pb-3">
-            <h3 className="font-display text-[1.8rem] leading-none tracking-[.04em] text-forest">
-              {ORDER_COPY.title}
-            </h3>
-          </div>
-
-          {itemCount === 0 ? (
-            <p className="rounded-[14px] border border-dashed border-forest/20 bg-cream/60 px-4 py-6 text-center text-[.82rem] text-muted">
-              {ORDER_COPY.empty}
-            </p>
-          ) : (
+        {hasItems && (
+          <div
+            ref={orderCardRef}
+            id="your-order"
+            className="order-card-enter mt-5 scroll-mt-[84px] rounded-[26px] border border-forest/15 bg-paper p-4 shadow-[0_8px_28px_rgba(31,77,26,.07)] sm:p-5 lg:scroll-mt-[88px]"
+          >
+            <div className="mb-3.5 border-b-2 border-dashed border-forest/20 pb-3">
+              <h3 className="font-display text-[1.8rem] leading-none tracking-[.04em] text-forest">
+                {ORDER_COPY.title}
+              </h3>
+            </div>
             <div className="grid gap-4">
               {orderGroups.map((group) => (
                 <div key={group.id}>
@@ -676,50 +672,50 @@ export default function TrayMenu() {
                 </div>
               ))}
             </div>
-          )}
 
-          <div className="mt-4 border-t-2 border-dashed border-forest/15 pt-3">
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-[.72rem] font-semibold text-muted">
-                {itemCount} {itemCount === 1 ? 'item' : 'items'}
-              </p>
-              <button
-                type="button"
-                onClick={clearOrder}
-                disabled={itemCount === 0}
-                className="text-[.7rem] font-bold text-muted underline decoration-dotted underline-offset-2 transition hover:text-[#a11d0e] disabled:cursor-not-allowed disabled:opacity-40"
+            <div className="mt-4 border-t-2 border-dashed border-forest/15 pt-3">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-[.72rem] font-semibold text-muted">
+                  {itemCount} {itemCount === 1 ? 'item' : 'items'}
+                </p>
+                <button
+                  type="button"
+                  onClick={clearOrder}
+                  disabled={itemCount === 0}
+                  className="text-[.7rem] font-bold text-muted underline decoration-dotted underline-offset-2 transition hover:text-[#a11d0e] disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Clear all
+                </button>
+              </div>
+
+              <div className="mt-1.5 flex items-baseline justify-between gap-3">
+                <span className="text-[.72rem] font-extrabold tracking-[.12em] text-forest uppercase">
+                  Total
+                </span>
+                <span className="font-display text-[1.9rem] leading-none tracking-[.03em] text-orange-deep">
+                  {formatPeso(total)}
+                </span>
+              </div>
+
+              <p className="mt-1.5 text-[.64rem] leading-relaxed text-muted">{ORDER_COPY.note}</p>
+
+              <a
+                href={itemCount > 0 ? orderHref : undefined}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-disabled={itemCount === 0}
+                onClick={(event) => {
+                  if (itemCount === 0) event.preventDefault()
+                }}
+                className={`btn btn-forest mt-3 w-full ${
+                  itemCount === 0 ? 'cursor-not-allowed opacity-50' : ''
+                }`}
               >
-                Clear all
-              </button>
+                <Icon name="messenger" /> Send Order on Messenger
+              </a>
             </div>
-
-            <div className="mt-1.5 flex items-baseline justify-between gap-3">
-              <span className="text-[.72rem] font-extrabold tracking-[.12em] text-forest uppercase">
-                Total
-              </span>
-              <span className="font-display text-[1.9rem] leading-none tracking-[.03em] text-orange-deep">
-                {formatPeso(total)}
-              </span>
-            </div>
-
-            <p className="mt-1.5 text-[.64rem] leading-relaxed text-muted">{ORDER_COPY.note}</p>
-
-            <a
-              href={itemCount > 0 ? orderHref : undefined}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-disabled={itemCount === 0}
-              onClick={(event) => {
-                if (itemCount === 0) event.preventDefault()
-              }}
-              className={`btn btn-forest mt-3 w-full ${
-                itemCount === 0 ? 'cursor-not-allowed opacity-50' : ''
-              }`}
-            >
-              <Icon name="messenger" /> Send Order on Messenger
-            </a>
           </div>
-        </div>
+        )}
 
         {showOrderChip && (
           <button
