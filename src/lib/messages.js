@@ -23,7 +23,7 @@ export function buildInquiryMessage(values) {
     `Delivery address: ${values.address}`,
     `Notes: ${values.notes || '—'}`,
     '',
-    'Salamat!',
+    'Thank you po!',
   ].join('\n')
 }
 
