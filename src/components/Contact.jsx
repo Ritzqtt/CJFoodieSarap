@@ -18,39 +18,66 @@ export default function Contact() {
             <h3 className="mb-3 flex items-center gap-2 font-display text-[1.5rem] tracking-[.04em] text-forest">
               <Icon name="phone" className="h-[22px] w-[22px] text-orange-deep" /> Reach Us
             </h3>
-
-            <a
-              href={`tel:${CONTACT.phoneTel}`}
-              className="group flex items-start gap-2.5 border-t border-dashed border-forest/15 py-2.5 first:border-t-0 first:pt-0"
-            >
-              <span className="grid h-[38px] w-[38px] shrink-0 place-items-center rounded-[11px] bg-leaf text-forest" aria-hidden="true">
-                <Icon name="phone" className="h-5 w-5" />
+          <span className="group flex items-start gap-2.5 border-t border-dashed border-forest/15 py-2.5 first:border-t-0 first:pt-0">
+            <span className="grid h-[38px] w-[38px] shrink-0 place-items-center rounded-[11px] bg-leaf text-forest">
+              <Icon name="phone" className="h-5 w-5" />
+            </span>
+            <span>
+              <span className="block text-[.58rem] font-extrabold tracking-[.11em] text-muted uppercase">
+                Phone · Viber · WhatsApp
               </span>
-              <span>
-                <span className="block text-[.58rem] font-extrabold tracking-[.11em] text-muted uppercase">
-                  Phone · Viber · WhatsApp
-                </span>
-                <span className="block text-[.88rem] leading-snug font-bold text-forest group-hover:text-orange-deep">
-                  {CONTACT.phoneDisplay}
-                </span>
-                <span className="block text-[.64rem] font-medium text-muted">Tap to call</span>
+              <a
+                href={`tel:${CONTACT.phoneTel}`}
+                className="block text-[.88rem] leading-snug font-bold text-forest hover:text-orange-deep md:pointer-events-none md:no-underline"
+              >
+                {CONTACT.phoneDisplay}
+              </a>
+              <span className="block text-[.64rem] font-medium text-muted">
+                <span className="md:hidden">Tap to call</span>
+                <span className="hidden md:inline">Phone number</span>
               </span>
-            </a>
+            </span>
+          </span>
 
             <a
               href={`mailto:${CONTACT.email}`}
+              onClick={(event) => {
+                event.preventDefault()
+
+                const isMobile = /Android|iPhone|iPad|iPod/i.test(
+                  navigator.userAgent
+                )
+
+                if (isMobile) {
+                  window.location.href = `mailto:${CONTACT.email}`
+                } else {
+                  const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(CONTACT.email)}`
+
+                  const accountChooserUrl =
+                    `https://accounts.google.com/AccountChooser?service=mail&continue=${encodeURIComponent(gmailUrl)}`
+
+                  window.open(
+                    accountChooserUrl,
+                    '_blank',
+                    'noopener,noreferrer'
+                  )
+                }
+              }}
               className="group flex items-start gap-2.5 border-t border-dashed border-forest/15 py-2.5"
             >
               <span className="grid h-[38px] w-[38px] shrink-0 place-items-center rounded-[11px] bg-leaf text-forest" aria-hidden="true">
                 <Icon name="mail" className="h-5 w-5" />
               </span>
+
               <span>
                 <span className="block text-[.58rem] font-extrabold tracking-[.11em] text-muted uppercase">
                   Email
                 </span>
+
                 <span className="block text-[.88rem] leading-snug font-bold break-all text-forest group-hover:text-orange-deep">
                   {CONTACT.email}
                 </span>
+
                 <span className="block text-[.64rem] font-medium text-muted">
                   Send your inquiry or requirements
                 </span>

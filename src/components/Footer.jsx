@@ -102,11 +102,43 @@ export default function Footer() {
               Get in Touch
             </h3>
             <div className="grid gap-1.5">
-              <a href={`tel:${CONTACT.phoneTel}`} className="flex items-start gap-2 text-[.78rem] text-[#dce7cf] no-underline hover:text-gold">
-                <Icon name="phone" className="mt-0.5 h-4 w-4 shrink-0 text-gold" /> {CONTACT.phoneDisplay}
+            <span className="flex items-start gap-2 text-[.78rem] text-[#dce7cf]">
+              <Icon name="phone" className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
+              <a
+                href={`tel:${CONTACT.phoneTel}`}
+                className="hover:text-gold md:pointer-events-none md:no-underline"
+              >
+                {CONTACT.phoneDisplay}
               </a>
-              <a href={`mailto:${CONTACT.email}`} className="flex items-start gap-2 text-[.78rem] break-all text-[#dce7cf] no-underline hover:text-gold">
-                <Icon name="mail" className="mt-0.5 h-4 w-4 shrink-0 text-gold" /> {CONTACT.email}
+            </span>
+              <a
+                href={`mailto:${CONTACT.email}`}
+                onClick={(event) => {
+                  event.preventDefault()
+
+                  const isMobile = /Android|iPhone|iPad|iPod/i.test(
+                    navigator.userAgent
+                  )
+
+                  if (isMobile) {
+                    window.location.href = `mailto:${CONTACT.email}`
+                  } else {
+                    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(CONTACT.email)}`
+
+                    const accountChooserUrl =
+                      `https://accounts.google.com/AccountChooser?service=mail&continue=${encodeURIComponent(gmailUrl)}`
+
+                    window.open(
+                      accountChooserUrl,
+                      '_blank',
+                      'noopener,noreferrer'
+                    )
+                  }
+                }}
+                className="flex items-start gap-2 text-[.78rem] break-all text-[#dce7cf] no-underline hover:text-gold"
+              >
+                <Icon name="mail" className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
+                {CONTACT.email}
               </a>
               <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="flex items-start gap-2 text-[.78rem] text-[#dce7cf] no-underline hover:text-gold">
                 <Icon name="pin" className="mt-0.5 h-4 w-4 shrink-0 text-gold" /> {CONTACT.address}

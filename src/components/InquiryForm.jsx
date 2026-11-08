@@ -555,7 +555,10 @@ export default function InquiryForm() {
               </p>
               <p className="mt-1.5 text-[.67rem] leading-relaxed text-muted">
                 This form opens your own Messenger or email app. You can also call or text{' '}
-                <a href={`tel:${CONTACT.phoneTel}`} className="font-semibold text-forest underline">
+                <a
+                  href={`tel:${CONTACT.phoneTel}`}
+                  className="font-semibold text-forest underline md:pointer-events-none md:no-underline"
+                >
                   {CONTACT.phoneDisplay}
                 </a>
                 .
