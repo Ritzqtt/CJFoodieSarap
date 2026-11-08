@@ -95,9 +95,7 @@ function FormField({ id, name, label, required = false, error, full = false, hin
       <label htmlFor={id} className="text-[.74rem] font-bold tracking-[.02em] text-forest">
         {label}{' '}
         {required ? (
-          <span className="text-orange-deep" aria-hidden="true">
-            *
-          </span>
+          <span className="text-orange-deep" aria-hidden="true">*</span>
         ) : (
           <span className="font-medium text-muted">(optional)</span>
         )}
@@ -132,7 +130,9 @@ export default function InquiryForm() {
     if (!interestOpen) return undefined
 
     const handlePointerDown = (event) => {
-      if (!interestRef.current?.contains(event.target)) setInterestOpen(false)
+      if (!interestRef.current?.contains(event.target)) {
+        setInterestOpen(false)
+      }
     }
 
     document.addEventListener('pointerdown', handlePointerDown)
@@ -140,8 +140,12 @@ export default function InquiryForm() {
   }, [interestOpen])
 
   useEffect(() => {
-    if (!interestOpen || activeInterest < 0) return undefined
-    const option = interestListRef.current?.querySelector(`[data-index="${activeInterest}"]`)
+    if (!interestOpen || activeInterest < 0) return
+
+    const option = interestListRef.current?.querySelector(
+      `[data-index="${activeInterest}"]`
+    )
+
     option?.scrollIntoView({ block: 'nearest' })
   }, [interestOpen, activeInterest])
 
@@ -167,7 +171,10 @@ export default function InquiryForm() {
     INTEREST_OPTIONS.find((option) => option.value === values.interest)?.label ?? ''
 
   const openInterest = (preferredIndex = 0) => {
-    const selectedIndex = INTEREST_OPTIONS.findIndex((option) => option.value === values.interest)
+    const selectedIndex = INTEREST_OPTIONS.findIndex(
+      (option) => option.value === values.interest
+    )
+
     setInterestOpen(true)
     setActiveInterest(selectedIndex >= 0 ? selectedIndex : preferredIndex)
   }
@@ -233,8 +240,10 @@ export default function InquiryForm() {
     }
   }
 
+  
   const handleSubmit = (event) => {
     event.preventDefault()
+
     const nextErrors = validate(values)
     setErrors(nextErrors)
 
@@ -242,37 +251,55 @@ export default function InquiryForm() {
       setStatus('Please check the highlighted fields and try again.')
       setStatusIsError(true)
       setShowOutput(false)
+
       const firstInvalid = Object.keys(nextErrors)[0]
       formRef.current?.querySelector(`[name="${firstInvalid}"]`)?.focus()
+
       return
     }
 
     setStatusIsError(false)
+
     const channel =
-      event.nativeEvent.submitter?.getAttribute('data-channel') === 'email' ? 'email' : 'messenger'
+      event.nativeEvent.submitter?.getAttribute('data-channel') === 'email'
+        ? 'email'
+        : 'messenger'
+
     const builtMessage = buildInquiryMessage(values)
+
     setMessage(builtMessage)
     setShowOutput(true)
 
     if (channel === 'email') {
       const subject = `CJFoodieSarap inquiry — ${values.name} — ${formatDate(values.date)}`
-      window.location.href = `mailto:${CONTACT.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(builtMessage)}`
+
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+
+      if (isMobile) {
+        // Mobile: Open the default email application
+        const mailtoUrl = `mailto:${CONTACT.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(builtMessage)}`
+
+        window.location.href = mailtoUrl
+      } else {
+        // Desktop: Let the customer choose their Google account
+        const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(CONTACT.email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(builtMessage)}`
+
+        const accountChooserUrl =
+          `https://accounts.google.com/AccountChooser?service=mail&continue=${encodeURIComponent(gmailUrl)}`
+
+        window.open(accountChooserUrl, '_blank', 'noopener,noreferrer')
+      }
+
       setStatus(
-        `Opening your email app with the inquiry filled in. If nothing opens, copy the message below and send it to ${CONTACT.email}.`,
+        `Your inquiry is ready! Please review and send your email to ${CONTACT.email}.`
       )
     } else {
       window.open(messengerUrl(builtMessage), '_blank', 'noopener')
+
       setStatus(
-        'Opening Messenger with your details ready to send. If nothing opens, copy the message below and send it to us.',
+        'Opening Messenger with your details ready to send.'
       )
     }
-  }
-
-  const handleCopy = async () => {
-    if (!message) return
-    const copied = await copyTextToClipboard(message)
-    setCopyLabel(copied ? 'Copied!' : 'Copy failed')
-    window.setTimeout(() => setCopyLabel('Copy message'), 2000)
   }
 
   return (
@@ -280,8 +307,8 @@ export default function InquiryForm() {
       <div className="wrap">
         <div className="reveal">
           <SectionHeading eyebrow="Inquiry" title="Tell Us About Your Handaan">
-            Fill this out and we&apos;ll open Messenger or your email app with your details ready to
-            send. 
+            Fill this out and we'll open Messenger or your email app with your details ready to
+            send.
           </SectionHeading>
         </div>
 
@@ -298,45 +325,20 @@ export default function InquiryForm() {
               />
             </span>
             <h3 className="mb-1.5 font-display text-[2rem] leading-[.95] tracking-[.03em] text-white">
-              Let&apos;s go, Kafoodies!
+              Let's go, Kafoodies!
             </h3>
+
+            <br />
+
             <p className="text-[.82rem] leading-relaxed text-[#e6eeda]">
-              Prefer to chat directly? Message us on Facebook or call — we&apos;re happy to help you
-              plan the menu.
+              Submit the inquiry form with your event details, contact information, preferred
+              package, and delivery address. We will review your request and get in touch with you
+              via Messenger or Email.
             </p>
-
-            <div className="my-4 grid gap-2">
-              <a
-                href={`tel:${CONTACT.phoneTel}`}
-                className="flex items-center gap-2.5 rounded-xl border border-cream/20 bg-cream/5 px-3 py-2.5 text-[.78rem] font-semibold text-cream no-underline transition hover:border-gold/50 hover:bg-gold/15"
-              >
-                <Icon name="phone" className="h-[18px] w-[18px] text-gold" />
-                <span>
-                  {CONTACT.phoneDisplay}
-                  <small className="block font-normal text-[#cfddc2]">Call · Viber · WhatsApp</small>
-                </span>
-              </a>
-              <a
-                href={`mailto:${CONTACT.email}`}
-                className="flex items-center gap-2.5 rounded-xl border border-cream/20 bg-cream/5 px-3 py-2.5 text-[.78rem] font-semibold text-cream no-underline transition hover:border-gold/50 hover:bg-gold/15"
-              >
-                <Icon name="mail" className="h-[18px] w-[18px] text-gold" />
-                {CONTACT.email}
-              </a>
-              <a
-                href={CONTACT.messenger}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2.5 rounded-xl border border-cream/20 bg-cream/5 px-3 py-2.5 text-[.78rem] font-semibold text-cream no-underline transition hover:border-gold/50 hover:bg-gold/15"
-              >
-                <Icon name="messenger" className="h-[18px] w-[18px] text-gold" />
-                CJFoodieSarap
-              </a>
-            </div>
-
+            <br />
             <p className="text-[.82rem] leading-relaxed text-[#e6eeda]">
-              <strong className="text-gold">FREE delivery</strong> in Makati &amp; Taguig. Other areas
-              — please inquire first.
+              <strong className="text-gold">FREE delivery</strong> in Makati &amp; Taguig. Other
+              areas — please inquire first.
             </p>
             <p className="mt-4 border-t border-cream/20 pt-3 text-[.68rem] text-[#cfddc2]">
               CJFoodieSarap · Serving customers since 2018 · Good Food Brings People Together.
@@ -434,18 +436,18 @@ export default function InquiryForm() {
                       aria-invalid={Boolean(errors.interest)}
                       aria-describedby="err-interest"
                       onClick={() => {
-                        if (interestOpen) {
-                          closeInterest()
-                        } else {
-                          openInterest(0)
-                        }
+                        if (interestOpen) closeInterest()
+                        else openInterest(0)
                       }}
                       onKeyDown={handleInterestKeyDown}
                       className={`${inputClass('interest')} flex items-center justify-between gap-2 text-left ${
                         values.interest ? 'text-ink' : 'text-muted'
                       }`}
                     >
-                      <span className="truncate">{selectedInterestLabel || 'Choose one…'}</span>
+                      <span className="truncate">
+                        {selectedInterestLabel || 'Choose one…'}
+                      </span>
+
                       <Icon
                         name="arrow"
                         className={`h-4 w-4 shrink-0 transition-transform duration-200 ${
@@ -552,34 +554,12 @@ export default function InquiryForm() {
                 {status}
               </p>
               <p className="mt-1.5 text-[.67rem] leading-relaxed text-muted">
-                This form opens your own Messenger or email app.
-                You can also call or text{' '}
+                This form opens your own Messenger or email app. You can also call or text{' '}
                 <a href={`tel:${CONTACT.phoneTel}`} className="font-semibold text-forest underline">
                   {CONTACT.phoneDisplay}
                 </a>
                 .
               </p>
-
-              {showOutput && (
-                <div className="mt-4 rounded-[14px] border-2 border-dashed border-[#8ab87b] bg-[#f1f8ec] p-3.5">
-                  <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
-                    <strong className="text-[.82rem] text-forest">Your inquiry is ready</strong>
-                    <button type="button" className="btn btn-forest btn-sm min-h-9 px-3 py-1.5 text-[.7rem]" onClick={handleCopy}>
-                      <Icon name="copy" className="h-4 w-4" /> {copyLabel}
-                    </button>
-                  </div>
-                  <p className="mb-2 text-[.7rem] leading-relaxed text-[#46583b]">
-                    If your Messenger or email app didn&apos;t open, copy the message below and send it
-                    to us directly.
-                  </p>
-                  <pre
-                    className="max-h-[260px] overflow-auto rounded-[10px] bg-white p-3 font-mono text-[.72rem] leading-relaxed whitespace-pre-wrap break-words text-[#3a3529]"
-                    tabIndex={0}
-                  >
-                    {message}
-                  </pre>
-                </div>
-              )}
             </form>
           </div>
         </div>
