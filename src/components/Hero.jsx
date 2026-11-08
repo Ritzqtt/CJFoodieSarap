@@ -415,7 +415,7 @@ export default function Hero() {
 
           <div className="relative mx-auto w-full max-w-[470px]">
             <div
-              className={`photo-ph hero-photo-stack [&::before]:hidden aspect-[5/4] lg:aspect-[1/.92] ${
+              className={`hero-photo-stack aspect-[5/4] lg:aspect-[1/.92] ${
                 hasInteracted ? 'has-interacted' : ''
               }`}
             >

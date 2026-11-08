@@ -17,13 +17,6 @@ export default function App() {
 
   return (
     <>
-      <a
-        href="#main"
-        className="fixed top-2 left-2 z-[200] -translate-y-[150%] rounded-[10px] bg-forest px-4 py-3 font-bold text-white no-underline transition-transform focus:translate-y-0"
-      >
-        Skip to main content
-      </a>
-
       <IconSprite />
       <Navbar />
 

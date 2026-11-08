@@ -249,11 +249,9 @@
   .hero-photo-stack {
     position: relative;
     isolation: isolate;
-    overflow: hidden;
+    overflow: visible;
     border: 0;
-    border-radius: 38px;
-    /* No decorative beige/striped panel behind the pile. The cards and
-       the frame geometry stay exactly as they were. */
+    border-radius: 0;
     background: transparent;
     box-shadow: none;
     touch-action: pan-y;
