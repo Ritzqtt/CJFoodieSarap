@@ -3,241 +3,273 @@ import { BRAND, HERO_TILES, heroPhotos, messengerUrl } from '../data'
 import { BOOK_MESSAGE } from '../lib/messages'
 import { Icon } from './Icons'
 
-const PHOTO_TRANSITION_MS = 600
-const PHOTO_EXIT_MS = 325
+/* Stack behaviour */
+const DESKTOP_QUERY = '(min-width: 1024px)'
 const PHOTO_SLOT_STAGGER_MS = 25
-const PHOTO_ANIMATION_MS = PHOTO_TRANSITION_MS + 7 * PHOTO_SLOT_STAGGER_MS
-const PHOTO_INTRO_STAGGER_MS = 40
-const STACK_SCALE = 1
+const PHOTO_FLY_MS = 380
+const PHOTO_RETURN_MS = 350
+const PHOTO_REDUCED_FADE_MS = 150
+const PHOTO_DRAG_SPRING_MS = 220
+const SWIPE_THRESHOLD_PX = 40
+const DRAG_SUPPRESS_MS = 500
+const MAX_VISIBLE_SLOT = 6
 const PHOTO_ZOOM = 1.06
 
+/*
+ * Fixed, deterministic pile. Every value is [rotate deg, translateX %,
+ * translateY %, scale] plus the static darkening overlay used on the
+ * cards in the back. Cards deeper than slot 6 reuse slot 6 and are
+ * hidden with `visibility` (never opacity).
+ */
 const PHOTO_STACK_SLOTS = [
-  {
-    x: '0%',
-    y: '0%',
-    rotation: '0deg',
-    scale: STACK_SCALE,
-    opacity: 1,
-    shade: 0,
-    intro: 'translate(0, -8%) rotate(0deg) scale(.96)',
-  },
-  {
-    x: '-0.6%',
-    y: '0.6%',
-    rotation: '-4.2deg',
-    scale: 0.96,
-    opacity: 0.97,
-    shade: 0.04,
-    intro: 'translate(-8%, 7%) rotate(-24deg) scale(.72)',
-  },
-  {
-    x: '0.6%',
-    y: '-0.6%',
-    rotation: '3.6deg',
-    scale: 0.94,
-    opacity: 0.94,
-    shade: 0.07,
-    intro: 'translate(8%, -7%) rotate(23deg) scale(.72)',
-  },
-  {
-    x: '-0.6%',
-    y: '0.6%',
-    rotation: '-7.2deg',
-    scale: 0.9,
-    opacity: 0.91,
-    shade: 0.1,
-    intro: 'translate(-8%, 7%) rotate(-30deg) scale(.69)',
-  },
-  {
-    x: '0.6%',
-    y: '-0.6%',
-    rotation: '7.8deg',
-    scale: 0.89,
-    opacity: 0.88,
-    shade: 0.13,
-    intro: 'translate(8%, -7%) rotate(32deg) scale(.69)',
-  },
-  {
-    x: '-0.6%',
-    y: '0.6%',
-    rotation: '-3deg',
-    scale: 0.91,
-    opacity: 0.85,
-    shade: 0.16,
-    intro: 'translate(-7%, 8%) rotate(-22deg) scale(.73)',
-  },
-  {
-    x: '0.6%',
-    y: '0.6%',
-    rotation: '6deg',
-    scale: 0.88,
-    opacity: 0.82,
-    shade: 0.18,
-    intro: 'translate(8%, 7%) rotate(29deg) scale(.7)',
-  },
-  {
-    x: '-0.6%',
-    y: '-0.6%',
-    rotation: '-6.6deg',
-    scale: 0.87,
-    opacity: 0.8,
-    shade: 0.2,
-    intro: 'translate(-8%, -7%) rotate(-31deg) scale(.68)',
-  },
+  { rotate: 0, x: 0, y: 0, scale: 1, shade: 0 },
+  { rotate: -8, x: -2.5, y: 2, scale: 0.99, shade: 0.08 },
+  { rotate: 7, x: 3, y: -2, scale: 0.98, shade: 0.11 },
+  { rotate: -14, x: -4, y: 3, scale: 0.97, shade: 0.14 },
+  { rotate: 13, x: 4.5, y: -3, scale: 0.96, shade: 0.16 },
+  { rotate: -5, x: -1.5, y: 4, scale: 0.95, shade: 0.18 },
+  { rotate: 10, x: 3, y: 3.5, scale: 0.94, shade: 0.2 },
 ]
 
+const slotTransform = (slot) =>
+  `translate3d(${slot.x}%, ${slot.y}%, 0) rotate(${slot.rotate}deg) scale(${slot.scale})`
+
 export default function Hero() {
-  const [stackState, setStackState] = useState(() => ({
-    order: heroPhotos,
-    exitingId: null,
-    exitPhase: 'idle',
-    exitX: '45%',
-    exitRotation: '12deg',
-  }))
-  const [isDragging, setIsDragging] = useState(false)
-  const [isReturning, setIsReturning] = useState(false)
+  // `order` always holds every photo index exactly once. Index 0 is the
+  // top card; the rest of the array is the pile behind it.
+  const [order, setOrder] = useState(() => heroPhotos.map((_, index) => index))
+  const [leaving, setLeaving] = useState(null)
   const [hasInteracted, setHasInteracted] = useState(false)
-  const [introState, setIntroState] = useState('pending')
+  const [dragging, setDragging] = useState(false)
+
+  const orderRef = useRef(order)
   const isAnimatingRef = useRef(false)
   const queuedClickRef = useRef(false)
+  const queuedDirectionRef = useRef(null)
+  const isDesktopRef = useRef(false)
+  const directionRef = useRef(1) // +1 = right, -1 = left (mobile alternation)
+  const cardRefs = useRef(new Map())
+  const activeAnimationsRef = useRef([])
+  const springAnimationRef = useRef(null)
   const pointerStartRef = useRef(null)
   const suppressClickRef = useRef(false)
   const suppressClickTimerRef = useRef(null)
-  const dragReturnTimerRef = useRef(null)
-  const animationTimersRef = useRef([])
-  const topCardRef = useRef(null)
-  const stackRef = useRef(null)
   const restoreFocusRef = useRef(false)
-  const stackStateRef = useRef(stackState)
-  const photoOrder = stackState.order
-  const currentPhoto = photoOrder[0]
-  const currentPosition = heroPhotos.indexOf(currentPhoto) + 1
+
+  const topIndex = order[0]
+  const currentPosition = topIndex + 1
+
+  const getCard = (index) => cardRefs.current.get(index)
+  const getTopCard = () => getCard(orderRef.current[0])
 
   useEffect(() => {
-    const stack = stackRef.current
-    if (!stack) return undefined
-
-    let introTimer
-    const observer = new IntersectionObserver(([entry]) => {
-      if (!entry.isIntersecting) return
-
-      observer.disconnect()
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        setIntroState('done')
-        return
-      }
-
-      setIntroState('running')
-      introTimer = window.setTimeout(() => setIntroState('done'), 760)
-    }, { threshold: 0.2 })
-
-    observer.observe(stack)
-
-    return () => {
-      observer.disconnect()
-      window.clearTimeout(introTimer)
+    const query = window.matchMedia(DESKTOP_QUERY)
+    const onChange = (event) => {
+      isDesktopRef.current = event.matches
     }
+
+    isDesktopRef.current = query.matches
+    if (typeof query.addEventListener === 'function') {
+      query.addEventListener('change', onChange)
+      return () => query.removeEventListener('change', onChange)
+    }
+
+    query.addListener(onChange)
+    return () => query.removeListener(onChange)
   }, [])
 
   useEffect(() => {
     heroPhotos.forEach((photo) => {
       const image = new Image()
       image.src = photo.src
-      image.decode().catch((error) => {
-        console.error(`Could not preload hero photo: ${photo.src}`, error)
-      })
+      if (typeof image.decode === 'function') {
+        image.decode().catch(() => {})
+      }
     })
-
-    return () => {
-      animationTimersRef.current.forEach((timer) => window.clearTimeout(timer))
-      window.clearTimeout(suppressClickTimerRef.current)
-      window.clearTimeout(dragReturnTimerRef.current)
-    }
   }, [])
 
   useEffect(() => {
-    if (restoreFocusRef.current) {
-      topCardRef.current?.focus({ preventScroll: true })
-      restoreFocusRef.current = false
-    }
-  }, [photoOrder])
+    if (!restoreFocusRef.current) return
+    restoreFocusRef.current = false
+    getCard(order[0])?.focus({ preventScroll: true })
+  }, [order])
 
-  const showNextPhoto = (exitX = '45%', exitRotation = '12deg', leavingCard = null) => {
+  useEffect(
+    () => () => {
+      activeAnimationsRef.current.forEach((animation) => animation.cancel())
+      activeAnimationsRef.current = []
+      springAnimationRef.current?.cancel()
+      window.clearTimeout(suppressClickTimerRef.current)
+    },
+    [],
+  )
+
+  const cancelActiveAnimations = () => {
+    activeAnimationsRef.current.forEach((animation) => {
+      try {
+        animation.cancel()
+      } catch {
+        // The animation may already be finished/removed.
+      }
+    })
+    activeAnimationsRef.current = []
+  }
+
+  const finishAdvance = (outgoingIndex) => {
+    const card = getCard(outgoingIndex)
+    if (card) card.style.zIndex = ''
+    setLeaving(null)
+    isAnimatingRef.current = false
+
+    if (queuedClickRef.current) {
+      queuedClickRef.current = false
+      const queuedDirection = queuedDirectionRef.current
+      queuedDirectionRef.current = null
+      showNextPhoto(queuedDirection)
+    }
+  }
+
+  const springBack = () => {
+    const card = getTopCard()
+    if (!card) return
+
+    const from = window.getComputedStyle(card).transform
+    card.style.removeProperty('--drag-x')
+    card.style.removeProperty('--drag-rotation')
+
+    if (from === 'none' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const spring = card.animate(
+      [{ transform: from }, { transform: slotTransform(PHOTO_STACK_SLOTS[0]) }],
+      { duration: PHOTO_DRAG_SPRING_MS, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' },
+    )
+    springAnimationRef.current = spring
+    spring.finished.then(
+      () => {
+        spring.cancel()
+        if (springAnimationRef.current === spring) springAnimationRef.current = null
+      },
+      () => {},
+    )
+  }
+
+  const showNextPhoto = (swipeDirection = null) => {
     if (isAnimatingRef.current) {
-      leavingCard?.style.removeProperty('--drag-x')
-      leavingCard?.style.removeProperty('--drag-rotation')
       queuedClickRef.current = true
+      if (swipeDirection !== null) queuedDirectionRef.current = swipeDirection
+      // A swipe that lands mid-animation must not leave the new top card
+      // stuck at its dragged offset.
+      const currentTop = getTopCard()
+      currentTop?.style.removeProperty('--drag-x')
+      currentTop?.style.removeProperty('--drag-rotation')
       return
     }
+
+    const currentOrder = orderRef.current
+    const outgoingIndex = currentOrder[0]
+    const nextOrder = [...currentOrder.slice(1), outgoingIndex]
+    const card = getCard(outgoingIndex)
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const desktop = isDesktopRef.current
+
+    springAnimationRef.current?.cancel()
+    springAnimationRef.current = null
+
+    // At >= 1024px every change goes right. Below that, alternate and
+    // let a swipe decide the direction of that particular change.
+    const direction = swipeDirection ?? (desktop ? 1 : directionRef.current)
+    if (!desktop) directionRef.current = -direction
 
     isAnimatingRef.current = true
-    setIntroState('done')
-    restoreFocusRef.current = document.activeElement === topCardRef.current
+    restoreFocusRef.current = document.activeElement === card
     setHasInteracted(true)
-    const currentStack = stackStateRef.current
-    const outgoingPhoto = currentStack.order[0]
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const nextStack = {
-      ...currentStack,
-      order: [...currentStack.order.slice(1), outgoingPhoto],
-      exitingId: outgoingPhoto.src,
-      exitPhase: 'fly',
-      exitX: reducedMotion ? '0%' : exitX,
-      exitRotation: reducedMotion ? '0deg' : exitRotation,
-    }
 
-    stackStateRef.current = nextStack
-    setStackState(nextStack)
-    const scheduleAnimation = (callback, delay) => {
-      let timer
-      timer = window.setTimeout(() => {
-        animationTimersRef.current = animationTimersRef.current.filter((item) => item !== timer)
-        callback()
-      }, delay)
-      animationTimersRef.current.push(timer)
-    }
-
-    if (reducedMotion) {
-      scheduleAnimation(() => {
-        leavingCard?.style.removeProperty('--drag-x')
-        leavingCard?.style.removeProperty('--drag-rotation')
-        const finishedStack = {
-          ...stackStateRef.current,
-          exitingId: null,
-          exitPhase: 'idle',
-        }
-        stackStateRef.current = finishedStack
-        setStackState(finishedStack)
-        isAnimatingRef.current = false
-        if (queuedClickRef.current) {
-          queuedClickRef.current = false
-          showNextPhoto()
-        }
-      }, 200)
+    if (!card) {
+      orderRef.current = nextOrder
+      setOrder(nextOrder)
+      isAnimatingRef.current = false
       return
     }
 
-    scheduleAnimation(() => {
-      const settledStack = { ...stackStateRef.current, exitPhase: 'settle' }
-      stackStateRef.current = settledStack
-      setStackState(settledStack)
-    }, PHOTO_EXIT_MS)
-    scheduleAnimation(() => {
-      leavingCard?.style.removeProperty('--drag-x')
-      leavingCard?.style.removeProperty('--drag-rotation')
-      const finishedStack = {
-        ...stackStateRef.current,
-        exitingId: null,
-        exitPhase: 'idle',
-      }
-      stackStateRef.current = finishedStack
-      setStackState(finishedStack)
-      isAnimatingRef.current = false
-      if (queuedClickRef.current) {
-        queuedClickRef.current = false
-        showNextPhoto()
-      }
-    }, PHOTO_ANIMATION_MS)
+    const phase = reducedMotion ? 'fade' : 'fly'
+    setLeaving({ index: outgoingIndex, phase })
+
+    if (reducedMotion) {
+      // Crossfade only: no rotation, no fly-out, pile stays put until the
+      // fade is done.
+      const fade = card.animate(
+        [{ opacity: 1 }, { opacity: 0 }],
+        { duration: PHOTO_REDUCED_FADE_MS, easing: 'ease-out', fill: 'forwards' },
+      )
+      activeAnimationsRef.current = [fade]
+
+      fade.finished.then(
+        () => {
+          card.style.opacity = '0'
+          cancelActiveAnimations()
+          orderRef.current = nextOrder
+          setOrder(nextOrder)
+          finishAdvance(outgoingIndex)
+          window.requestAnimationFrame(() => {
+            card.style.opacity = ''
+          })
+        },
+        () => {},
+      )
+      return
+    }
+
+    // Capture where the card currently is (including any drag offset)
+    // before the new order changes its CSS slot.
+    const fromTransform = window.getComputedStyle(card).transform || slotTransform(PHOTO_STACK_SLOTS[0])
+    card.style.removeProperty('--drag-x')
+    card.style.removeProperty('--drag-rotation')
+
+    orderRef.current = nextOrder
+    setOrder(nextOrder)
+
+    // 118% of the card's own width puts the whole rotated card past the
+    // frame edge, so the z-index hand-off never cuts through the pile.
+    const flyOutDistance = direction * 118
+    const flyOutTransform = `translate3d(${flyOutDistance}%, -4%, 0) rotate(${direction * 14}deg) scale(1)`
+    const deepSlot = PHOTO_STACK_SLOTS[PHOTO_STACK_SLOTS.length - 1]
+
+    const fly = card.animate(
+      [{ transform: fromTransform }, { transform: flyOutTransform }],
+      { duration: PHOTO_FLY_MS, easing: 'cubic-bezier(0.4, 0, 0.2, 1)', fill: 'forwards' },
+    )
+    activeAnimationsRef.current = [fly]
+
+    fly.finished.then(
+      () => {
+        if (!activeAnimationsRef.current.includes(fly)) return
+
+        // The card is fully outside the frame at this point, so it can
+        // safely drop underneath the pile and slide back in from the
+        // side it left.
+        card.style.zIndex = '1'
+        setLeaving({ index: outgoingIndex, phase: 'return' })
+
+        const back = card.animate(
+          [
+            { transform: flyOutTransform },
+            { transform: slotTransform(deepSlot) },
+          ],
+          { duration: PHOTO_RETURN_MS, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards' },
+        )
+        activeAnimationsRef.current.push(back)
+
+        back.finished.then(
+          () => {
+            if (!activeAnimationsRef.current.includes(back)) return
+            cancelActiveAnimations()
+            finishAdvance(outgoingIndex)
+          },
+          () => {},
+        )
+      },
+      () => {},
+    )
   }
 
   const handleClick = () => {
@@ -254,26 +286,28 @@ export default function Hero() {
     if (event.pointerType === 'mouse') return
 
     pointerStartRef.current = { x: event.clientX, y: event.clientY }
-    setIsReturning(false)
-    setIsDragging(true)
-    event.currentTarget.setPointerCapture(event.pointerId)
+    setDragging(true)
+    event.currentTarget.setPointerCapture?.(event.pointerId)
   }
 
   const handlePointerMove = (event) => {
     const start = pointerStartRef.current
-    if (!start || !isDragging) return
+    if (!start || !dragging) return
 
     const deltaX = event.clientX - start.x
     const deltaY = event.clientY - start.y
-    if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      topCardRef.current?.style.setProperty('--drag-x', `${deltaX}px`)
-      topCardRef.current?.style.setProperty('--drag-rotation', `${deltaX * 0.035}deg`)
-    }
+    if (Math.abs(deltaX) <= Math.abs(deltaY)) return
+
+    const card = getTopCard()
+    if (!card) return
+    card.style.setProperty('--drag-x', `${deltaX}px`)
+    card.style.setProperty('--drag-rotation', `${deltaX * 0.035}deg`)
   }
 
   const handlePointerUp = (event) => {
     const start = pointerStartRef.current
     pointerStartRef.current = null
+    setDragging(false)
 
     if (!start) return
 
@@ -281,33 +315,28 @@ export default function Hero() {
     const deltaY = event.clientY - start.y
     const isHorizontalDrag = Math.abs(deltaX) > Math.abs(deltaY)
     const dragged = isHorizontalDrag && Math.abs(deltaX) >= 8
-    const shouldAdvance = isHorizontalDrag && Math.abs(deltaX) >= 40
+    const shouldAdvance = isHorizontalDrag && Math.abs(deltaX) >= SWIPE_THRESHOLD_PX
 
     if (dragged) {
       suppressClickRef.current = true
       window.clearTimeout(suppressClickTimerRef.current)
       suppressClickTimerRef.current = window.setTimeout(() => {
         suppressClickRef.current = false
-      }, 500)
+      }, DRAG_SUPPRESS_MS)
     }
 
     if (shouldAdvance) {
-      showNextPhoto(
-        deltaX < 0 ? '-45%' : '45%',
-        deltaX < 0 ? '-12deg' : '12deg',
-        event.currentTarget,
-      )
-    } else {
-      topCardRef.current?.style.setProperty('--drag-x', '0px')
-      topCardRef.current?.style.setProperty('--drag-rotation', '0deg')
-      if (dragged) {
-        setIsReturning(true)
-        window.clearTimeout(dragReturnTimerRef.current)
-        dragReturnTimerRef.current = window.setTimeout(() => setIsReturning(false), 260)
-      }
+      showNextPhoto(deltaX < 0 ? -1 : 1)
+      return
     }
 
-    setIsDragging(false)
+    springBack()
+  }
+
+  const handlePointerCancel = () => {
+    pointerStartRef.current = null
+    setDragging(false)
+    springBack()
   }
 
   return (
@@ -384,82 +413,70 @@ export default function Hero() {
             </ul>
           </div>
 
-          <div className="reveal relative mx-auto w-full max-w-[470px]" style={{ transitionDelay: '120ms' }}>
+          <div className="relative mx-auto w-full max-w-[470px]">
             <div
-              ref={stackRef}
               className={`photo-ph hero-photo-stack [&::before]:hidden aspect-[5/4] lg:aspect-[1/.92] ${
                 hasInteracted ? 'has-interacted' : ''
-              } intro-${introState}`}
+              }`}
             >
               <div className="hero-photo-pile">
-                {photoOrder.map((photo, layer) => {
-                  const isTop = layer === 0
-                  const slotIndex = Math.min(layer, PHOTO_STACK_SLOTS.length - 1)
+                {heroPhotos.map((photo, index) => {
+                  const layer = order.indexOf(index)
+                  const slotIndex = Math.min(layer, MAX_VISIBLE_SLOT)
                   const slot = PHOTO_STACK_SLOTS[slotIndex]
-                  const isExiting = photo.src === stackState.exitingId
-                  const cardClassName = `hero-photo-card ${
-                    isTop ? 'cursor-pointer' : 'pointer-events-none'
-                  } ${isExiting ? 'is-exiting' : ''} ${
-                    isTop && isDragging ? 'is-dragging' : ''
-                  } ${isTop && isReturning ? 'is-returning' : ''}`
-                  const cardStyle = {
-                    '--slot-x': slot.x,
-                    '--slot-y': slot.y,
-                    '--slot-rotation': slot.rotation,
-                    '--slot-scale': slot.scale * STACK_SCALE,
-                    '--slot-opacity': slot.opacity,
-                    '--slot-shade': slot.shade,
-                    '--intro-transform': slot.intro,
-                    '--intro-delay': `${slotIndex * PHOTO_INTRO_STAGGER_MS}ms`,
-                    '--slot-delay': `${isExiting ? 0 : layer * PHOTO_SLOT_STAGGER_MS}ms`,
-                    '--slot-index': slotIndex,
-                    '--photo-zoom': PHOTO_ZOOM,
-                    '--card-radius': isTop ? '38px' : '4px',
-                    '--photo-radius': isTop ? '33px' : '2px',
-                    '--exit-x': stackState.exitX,
-                    '--exit-rotation': stackState.exitRotation,
-                  }
+                  const isTop = layer === 0
+                  const isLeaving = leaving?.index === index
+                  const isHidden = layer > MAX_VISIBLE_SLOT && !isLeaving
+                  const phase = isLeaving ? leaving.phase : undefined
 
-                  const image = (
-                    <>
+                  return (
+                    <button
+                      key={photo.src}
+                      ref={(element) => {
+                        if (element) cardRefs.current.set(index, element)
+                        else cardRefs.current.delete(index)
+                      }}
+                      type="button"
+                      aria-label={
+                        isTop
+                          ? `Show next photo, ${currentPosition} of ${heroPhotos.length}: ${photo.alt}`
+                          : undefined
+                      }
+                      aria-hidden={isTop ? undefined : 'true'}
+                      tabIndex={isTop ? 0 : -1}
+                      disabled={!isTop}
+                      data-slot={slotIndex}
+                      data-hidden={isHidden ? 'true' : undefined}
+                      data-phase={phase}
+                      className={`hero-photo-card ${isTop ? 'cursor-pointer' : 'pointer-events-none'} ${
+                        isLeaving ? 'is-leaving' : ''
+                      } ${isTop && dragging ? 'is-dragging' : ''}`}
+                      style={{
+                        '--slot-x': `${slot.x}%`,
+                        '--slot-y': `${slot.y}%`,
+                        '--slot-rotate': `${slot.rotate}deg`,
+                        '--slot-scale': slot.scale,
+                        '--slot-shade': slot.shade,
+                        '--slot-index': slotIndex,
+                        '--slot-delay': `${isLeaving ? 0 : layer * PHOTO_SLOT_STAGGER_MS}ms`,
+                        '--photo-zoom': PHOTO_ZOOM,
+                      }}
+                      onClick={isTop ? handleClick : undefined}
+                      onPointerDown={isTop ? handlePointerDown : undefined}
+                      onPointerMove={isTop ? handlePointerMove : undefined}
+                      onPointerUp={isTop ? handlePointerUp : undefined}
+                      onPointerCancel={isTop ? handlePointerCancel : undefined}
+                    >
                       <img
                         src={photo.src}
                         alt=""
                         aria-hidden="true"
                         loading="eager"
                         decoding="async"
+                        draggable="false"
                         className="hero-photo-card-image"
                       />
-                      <span className="hero-photo-card-shade" />
-                    </>
-                  )
-
-                  return (
-                    <button
-                      key={photo.src}
-                      ref={isTop ? topCardRef : null}
-                      type="button"
-                      aria-label={isTop ? `Show next photo, ${currentPosition} of ${heroPhotos.length}: ${photo.alt}` : undefined}
-                      aria-hidden={!isTop}
-                      tabIndex={isTop ? 0 : -1}
-                      disabled={!isTop}
-                      data-slot={slotIndex}
-                      data-hidden={layer > 7}
-                      data-exit-phase={isExiting ? stackState.exitPhase : undefined}
-                      style={cardStyle}
-                      className={cardClassName}
-                      onClick={isTop ? handleClick : undefined}
-                      onPointerDown={isTop ? handlePointerDown : undefined}
-                      onPointerMove={isTop ? handlePointerMove : undefined}
-                      onPointerUp={isTop ? handlePointerUp : undefined}
-                      onPointerCancel={isTop ? () => {
-                        pointerStartRef.current = null
-                        topCardRef.current?.style.setProperty('--drag-x', '0px')
-                        topCardRef.current?.style.setProperty('--drag-rotation', '0deg')
-                        setIsDragging(false)
-                      } : undefined}
-                    >
-                      {image}
+                      <span className="hero-photo-card-shade" aria-hidden="true" />
                     </button>
                   )
                 })}
