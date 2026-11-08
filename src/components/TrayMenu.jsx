@@ -12,9 +12,6 @@ import { buildOrderMessage } from '../lib/messages'
 import { Icon } from './Icons'
 import SectionHeading from './SectionHeading'
 
-const ASK_MESSAGE =
-  "Hello po! I'd like help building a tray order for my handaan. Here's what I have in mind:"
-
 const trayKey = (categoryId, dish) => `tray:${categoryId}:${dish}`
 const specialKey = (specialId) => `special:${specialId}`
 const domId = (key) => key.replace(/[^a-z0-9-]+/gi, '-')
