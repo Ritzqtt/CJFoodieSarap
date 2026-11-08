@@ -35,11 +35,11 @@ export default function Footer() {
             <p className="mt-4 mb-1 font-display text-[1.6rem] leading-none tracking-[.03em] text-gold">
               Good Food Brings People Together.
             </p>
-            <p className="max-w-[34ch] text-[.78rem] leading-relaxed text-[#b9cba9]">
+            <p className="mx-auto max-w-[34ch] text-center text-[.78rem] leading-relaxed text-[#b9cba9] lg:mx-0 lg:text-left">
               Delicious food, made fresh. Budget-friendly party trays, bilao sets, and packed meals
               for every celebration.
             </p>
-            <div className="mt-3 flex flex-wrap gap-2" aria-label="Social media">
+            <div className="mt-3 flex flex-wrap justify-center gap-2 lg:justify-start" aria-label="Social media">
               {SOCIALS.map((social) => (
                 <a
                   key={social.id}
@@ -98,7 +98,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="mb-2.5 text-[.62rem] font-extrabold tracking-[.16em] text-gold uppercase">
+            <h3 className="mb-2.5 text-center text-[.62rem] font-extrabold tracking-[.16em] text-gold uppercase lg:text-left">
               Get in Touch
             </h3>
             <div className="grid gap-1.5">
